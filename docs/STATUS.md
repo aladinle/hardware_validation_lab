@@ -1,3 +1,43 @@
+# Current M2B.4 checkpoint - 2026-11-05 (America/Los_Angeles)
+
+## Outcome and approval boundary
+
+**M2B.4 local durable journal/spool/reconciliation is implemented for review on `codex/m2b.4-durable-agent-journal`.** User has explicitly approved merging M2B.4 and starting M2B.5 on a separate branch afterward. Merge preparation starts from main/origin main b6ba0b3; final Git outcome will be recorded after verification. Preserve the reviewed implementation. Stop before M2B.5; backend assignment/dispatch, SQL Attempt/resource models and real upload acknowledgements are not enabled. Full M2B is not complete.
+
+The private local SQLite ledger commits canonical execution/epoch/context and local overlapping-scope ownership before launch, then durable launch intent and observed worker birth identity before the plugin gate. Repeat delivery never starts again. Bounded staged sources/evidence are retained per execution, flushed and sealed with checksums before SQL completion. A valid seal recovers the completion-commit gap; incomplete/ambiguous launch state stays UNCERTAIN with local scope held. A matching explicit local-demo ACK is idempotent and removes neither files nor dedup records. No backend upload is claimed. Original outcomes/history remain unchanged.
+
+## Actual checks and commands
+
+| Check | Actual result |
+| --- | --- |
+| Initial git status and branch creation | Clean main at b6ba0b3; created codex/m2b.4-durable-agent-journal; main unchanged |
+| Final `scripts/postgres-local.ps1 -Action test` with LAB_B2_REVIEW_WHEEL pointing to actual 0.5.0 artifact | **143 tests passed in 43.507s, no skips**, `.local/b4-pg-final.txt`; includes all 130 baseline tests and 13 local journal/contract/process tests. PostgreSQL authority retained; local SQLite tests are not PostgreSQL scheduling evidence |
+| Targeted local journal tests after race/preflight fixes | 13 tests passed in 6.590s with no database setup/use by Django. `.local/b4-journal-preflight.txt`. Uses actual local SQLite journal/native children, not backend SQLite as a PostgreSQL substitute |
+| `python -m build --no-isolation --sdist-extract-dir .local/build-b4-final --outdir .local/dist-b4-final` | Actual 0.5.0 source distribution/wheel built; `.local/b4-build-final.txt` |
+| Review artifact SHA-256 | `75fb0ac62ccc54b65881111ca17d8bc614891c81888bef7117fc5788e4e38d37` |
+| Fresh `.local/b4-journal-venv` offline/no-deps installation and final reinstall | Clean Django-free Windows package; actual installed CLI/API and contained worker used |
+| `tests/b4_package_smoke.py --python .local/b4-journal-venv/Scripts/python.exe --wheel .local/dist-b4-final/hardware_validation_lab_contracts-0.5.0-py3-none-any.whl` | Eight scenario groups passed: completed delivery/restart replay with one observed spawn, repeated manual local ACK/stale-epoch refusal, six real abrupt crash checkpoints. `.local/b4-installed-final.txt`; evidence `.local/b4-installed-8_yclgd4/` |
+| `wsl -d Ubuntu --exec python3 tests/b4_package_smoke.py --python /usr/bin/python3 --wheel .local/dist-b4-final/hardware_validation_lab_contracts-0.5.0-py3-none-any.whl --source` | Same eight source-mode groups passed in existing Ubuntu, including real process exits and local WAL/seal recovery. `.local/b4-linux-final.txt`; evidence `.local/b4-source-ct_lhws7/`. Not a clean Linux package/service installation |
+| Native local tests | Two competing deliveries -> one accepted record/observed process creation; new-process replay after original source-file deletion -> same result/digest/no new spawn; epoch/body/identity conflict denied; invalid source hash takes no local ownership; no timeout takeover; PID reuse distinguished; overlapping uncertain scope blocked; quota/record cap, missing/corrupt DB and evidence conflict fail closed; repeated local ACK preserves spool and original PASS |
+| Actual crash checkpoints | After accept, launch intent, contained spawn-before-PID-record and post-gate launch -> UNCERTAIN/no relaunch. After flushed seal before SQL commit -> recover COMPLETE; after SQL commit before reply -> stable COMPLETE. Tests do not prove every instruction-level crash/physical action |
+| Static/configuration/document checks | Passed: lint/compileall/pip consistency; Django check, no migration drift/pending migrations; 15 Markdown files/68 resolving local links/73 unique requirement IDs/11 gates; changed-file whitespace and bounded credential-pattern checks, no private/runtime files included; reviewed source still matches the artifact digest. No browser flow changed; no new browser QA claimed |
+
+Initial native completion exposed Windows fsync on read-only-open file descriptors; changed flushing to read/write handles without changing file contents. Concurrent deliveries caught normal SQLite WAL/SHM disappearance between exists/lstat; fixed safe_path to tolerate genuine missing entries while still rejecting links/reparse points. Crash-matrix tests initially exhausted conservative default reservations across multiple uncertain test executions; raised only that test journal's configured budget, preserving production admission refusal. Added preflight size/hash/package validation before taking local scope. Failed intermediate runs are not final evidence.
+
+## Changed files, storage and limits
+
+Added contracts/journal_v1.py; agent/journal.py, journal_cli.py and process_identity.py; native crash/installed/source helpers in tests; lab/test_journal.py; and [M2B_4.md](M2B_4.md). Updated runner observation/launch hooks and safe path checks, package/entry point to 0.5.0, wheel verifier/test metadata and workflow/roadmap/requirements/architecture/security/decisions/README/status. No dependencies, Django models/migrations, live account/project/agent credential changes or new HTTP endpoints. CAN algorithm remains 0.3.0; old installed wheels/results are preserved, not silently upgraded.
+
+Local database uses WAL/FULL, mode=rw open, short BEGIN IMMEDIATE transactions, identity/platform/schema checks and bounded capacity. Accepted tombstones are never deleted. Default spool admission budget 256 MiB and 1,000 records; limits pause new acceptance instead of evicting evidence. One authoritative journal root per agent/runtime is required; do not erase/recreate, clone/share across instances or restore a stale root to bypass dedup. File checksums detect replay conflicts under trusted local storage, not a malicious OS owner. OS power cuts, controller behavior and portable Windows directory durability remain unproven; actual process restart was tested. SQLite is not backend reservation authority.
+
+UNCERTAIN never automatically reruns or clears scope. PID absence/age/ACK does not establish stopped descendants/readiness. Windows failure before containment may leave an unassigned suspended child in the earliest launch gap; record remains blocked rather than inventing termination. Actual fault injection was after containment before PID record and after gate, not every machine instruction. Local ACK explicitly records ack_source=local_demo and cannot stand in for authenticated backend upload/receipt handling. ACK never releases an uncertain/quarantined local scope. Hardware remains NOT_EVALUATED; no physical execution occurred.
+
+All normal smoke executions were stopped/cleaned by the runner. Ambiguous test states and sealed/raw evidence remain under ignored .local; no cleanup deleted user credentials or prior results. User webserver/PostgreSQL and existing WSL configuration were left under their control; no new background service, privileged component or host security change. Docker/hosted CI, macOS, Linux package/service deployment, real uploads/backend dispatch and hardware remain unverified/out of scope.
+
+Five-minute demo, complete test steps, expected status/exit codes and three optional review questions: [M2B_4.md](M2B_4.md). Next exact action: user reviews/tests and explicitly approves merge or requests changes. M2B.5 requires a new continuation after review.
+
+---
+
 # Current M2B.3 checkpoint - 2026-11-05 (America/Los_Angeles)
 
 ## Outcome and approval boundary

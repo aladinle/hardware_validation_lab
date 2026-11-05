@@ -1,6 +1,6 @@
 # M2B in eight reviewable tasks
 
-Decomposed 2026-11-05 at the user's request. The user subsequently authorized M2B.1; **M2B.1-.3 are now implemented locally**, with setup/evidence in [M2B_1.md](M2B_1.md). M2B.4-.8 remain planned; only explicit local synthetic file analysis exists, with no dispatch or hardware workload execution. See [M2B_2.md](M2B_2.md). [PLAN.md](PLAN.md) remains canonical; this document decomposes the unchanged parent acceptance gate. Evidence is in [STATUS.md](STATUS.md).
+Decomposed 2026-11-05 at the user's request. The user subsequently authorized M2B.1; **M2B.1-.4 are now implemented locally**, with setup/evidence in [M2B_1.md](M2B_1.md). M2B.5-.8 remain planned; only explicit local synthetic file analysis exists, with no dispatch or hardware workload execution. See [M2B_2.md](M2B_2.md). [PLAN.md](PLAN.md) remains canonical; this document decomposes the unchanged parent acceptance gate. Evidence is in [STATUS.md](STATUS.md).
 
 ## Work sequence
 
@@ -9,7 +9,7 @@ Decomposed 2026-11-05 at the user's request. The user subsequently authorized M2
 | M2B.1 (local, review) | Agent identity and versioned protocol | Native Windows enrollment/contact/rotation and PostgreSQL authority tests passed; see M2B_1.md | Reviewed M2A |
 | M2B.2 (local, review) | Trusted CAN comparison plugin and registry | Known fixtures give correct normalized offsets, length counts and PASS/FAIL/ERROR | .1 protocol |
 | M2B.3 (local, review) | Bounded local subprocess runner | Installed plugin runs within limits; timeout/cancel/malformed output and partial setup clean up correctly | .2 |
-| M2B.4 | Durable local agent journal and spool | Restart/redelivery recognizes the same execution and cannot launch it twice | .3 |
+| M2B.4 (local, review) | Durable local agent journal and spool | Restart/redelivery recognizes the same execution and cannot launch it twice | .3 |
 | M2B.5 | Basic PostgreSQL assignment and agent polling | One authorized queued fixture becomes one durable exclusive assignment with epoch; revoked access/digest mismatch blocks dispatch | .1-.4 |
 | M2B.6 | Results and authorized evidence delivery | Versioned JSON/human reports persist; upload replay is safe, conflicts and unauthorized access fail | .5 |
 | M2B.7 | Simulator failures, cancellation and second plugins | Attach/detach/crash/disconnect/cancel/cleanup evidence is correct; readiness and file/network/communication simulation extend the registry | .3-.6 |
@@ -17,9 +17,9 @@ Decomposed 2026-11-05 at the user's request. The user subsequently authorized M2
 
 Work sequentially so each task builds on a reviewed interface. Every task stops with its own checkpoint/demo and optional learning questions. One task can take multiple two-hour sessions; eight tasks does **not** mean eight sessions. The earlier 18-26 engineering-hour figure is a planning estimate for the whole milestone, not a commitment or eight independently measured estimates. Re-estimate after inspecting each task and recording actual checks.
 
-A new request to continue starts the next unfinished task after the preceding review, currently **M2B.4 only**, unless the user explicitly identifies another already-unblocked task. M3 remains outside M2B. Do not enable ordinary dispatch of M2A jobs merely because an intermediate task compiles or passes unit tests. Use isolated synthetic fixtures for development; execution remains explicit, opt-in and fail-closed until its dependencies and safety checks work.
+A new request to continue starts the next unfinished task after the preceding review, currently **M2B.5 only**, unless the user explicitly identifies another already-unblocked task. M3 remains outside M2B. Do not enable ordinary dispatch of M2A jobs merely because an intermediate task compiles or passes unit tests. Use isolated synthetic fixtures for development; execution remains explicit, opt-in and fail-closed until its dependencies and safety checks work.
 
-Current checkpoint: M2B.3 was implemented on codex/m2b.3-bounded-local-runner and merged into main after explicit user approval. Setup/tests are in [M2B_3.md](M2B_3.md). The next implementation task is M2B.4 only after review and a new continuation.
+Current checkpoint: M2B.4 is implemented on codex/m2b.4-durable-agent-journal. Setup/tests are in [M2B_4.md](M2B_4.md). Merge requires explicit approval; M2B.5 requires a new continuation.
 
 ## M2B.1 - agent identity and protocol
 
@@ -94,7 +94,7 @@ M2B passes only after **all eight tasks and the complete parent acceptance gate*
 
 ## Five-minute planning review
 
-1. Minute 0-1: locate existing M2A evidence; distinguish the completed identity/contact task from the five planned tasks.
+1. Minute 0-1: locate existing M2A evidence; distinguish the completed identity/contact task from the four planned tasks.
 2. Minute 1-2: trace a synthetic input through .2/.3 and distinguish assertion FAIL from execution ERROR.
 3. Minute 2-3: trace journal-before-launch and PostgreSQL assignment-before-delivery; explain .4/.5 dependencies.
 4. Minute 3-4: explain .6/.7 upload replay, pending cancel and quarantine when termination is uncertain.
