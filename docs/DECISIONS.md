@@ -43,3 +43,10 @@
 - Retain bounded raw hex/checksum and normalized evidence, deterministic versioned reports and first 100 details with full totals. ERROR/NOT_EVALUATED is distinct from evaluated product FAIL. These are synthetic local reports, not SQL attempt/hardware outcomes.
 - Verify the actual wheel against installed modules before comparing/publishing; bind new immutable versions to its SHA-256. Existing metadata-only publications and queued snapshots remain unchanged; new approval/grants are required. No automatic activation or scheduler execution.
 - Keep a local explicit CLI for review and a Django-free clean install. The native agent remains identity/idle only. Runner supervision, journal, dispatch, backend delivery, second plugins and JUnit stay at their gates. User authorized this feature branch and merge to main after checks, not M2B.3.
+
+## M2B.3 decisions - 2026-11-05
+
+- Keep standalone supervision separate from SQL assignment/journaling. Resolve only the fixed installed worker; staged expected/actual roles and verified wheel are local files, never commands or remotely selected executables.
+- On Windows launch suspended, attach a Job Object and resume before the plugin gate. Use native aggregate controls and explicit active-process accounting. Preserve host monitoring/temp behavior. Linux uses documented per-process resource limits/groups and records weaker monitoring scopes instead of implying cgroup isolation.
+- Keep primary outcome separate from cleanup/evidence/termination. Preserve evaluated PASS/FAIL if cleanup fails, but return exit 2 and require reconciliation. Timeout/cancel and OS-limit infrastructure errors do not become assertion FAIL. Unknown termination never authorizes reuse or physical readiness.
+- Build distribution 0.4.0 with unchanged CAN algorithm version 0.3.0 and new artifact digest. Keep old installed releases separate. User requested work on a new branch and explicit approval before main merge; no automatic merge or M2B.4 continuation.

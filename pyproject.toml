@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hardware-validation-lab-contracts"
-version = "0.3.0"
-description = "Typed contracts, native idle agent and synthetic CAN file comparison for Hardware Validation Lab"
+version = "0.4.0"
+description = "Typed contracts, native idle agent, synthetic CAN comparator and bounded local runner"
 requires-python = ">=3.11"
 
 [tool.setuptools]
@@ -14,6 +14,7 @@ packages = ["contracts", "agent", "workloads"]
 [project.scripts]
 hvl-agent = "agent.__main__:main"
 hvl-compare = "workloads.__main__:main"
+hvl-runner = "agent.runner_cli:main"
 
 [tool.ruff]
 target-version = "py311"

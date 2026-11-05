@@ -1,3 +1,47 @@
+# Current M2B.3 checkpoint - 2026-11-05 (America/Los_Angeles)
+
+## Outcome and approval boundary
+
+**M2B.3 standalone bounded runner is implemented locally and ready for review on `codex/m2b.3-bounded-local-runner`.** User approved merging the reviewed M2B.3 feature into main. Merge preparation started from unchanged main/origin main `74a67edf14cfb923d93aaed77b98a1d0c7437785`; final Git outcome will be recorded after verification. Preserve the reviewed implementation. Stop before M2B.4; approval to merge does not automatically authorize journal/dispatch work. The full M2B milestone is not complete.
+
+Scope: controlled prepare/execute/collect/owned cleanup; fixed installed CAN worker in a separate supervised process; validated resource policy, capped stdout/stderr, cooperative stop then escalation, observed process-tree termination, strict report/evidence checks and separate primary outcome/cleanup/evidence/uncertainty. Windows uses suspended launch and Job Objects; existing Ubuntu WSL uses process groups/per-process resource limits with explicitly weaker scopes. No SQL scheduler, Attempt/result ingestion, lease/quarantine allocator, durable journal, network dispatch, readiness or real hardware execution was added. Heartbeats remain idle.
+
+## Actual commands and results
+
+| Check | Actual result |
+| --- | --- |
+| Initial git status/branches; branch creation | Clean main at 74a67ed; created codex/m2b.3-bounded-local-runner from it; main not modified |
+| `scripts/postgres-local.ps1 -Action test` with LAB_B2_REVIEW_WHEEL pointing at actual 0.4.0 review wheel | **130 tests passed in 34.465s, no skips**, `.local/b3-pg-review.txt`. Includes all 112 baseline tests plus 18 runner contract/native Windows tests. No PostgreSQL claim derived from SQLite |
+| Early targeted `manage.py test lab.test_runner` | 16 tests passed in 12.456s, explicitly no database setup/use. This was process/contract evidence, not SQLite lock evidence. Two later regressions were included in final 130-test suite |
+| `python -m build --no-isolation --sdist-extract-dir .local/build-b3-review --outdir .local/dist-b3-review` | Actual 0.4.0 source distribution and wheel built; `.local/b3-build-review.txt` |
+| Actual review wheel SHA-256 | `77fbfc99810bfda965ae7c95f23a2b89b1d04a55b18b7b1c7dca8e2777dc937a` |
+| Fresh `.local/b3-runner-venv` offline/no-deps installation, final reinstall | Django-free installed package; base interpreter launches fixed installed worker behind containment/gate |
+| `tests/b3_package_smoke.py --python .local/b3-runner-venv/Scripts/python.exe --wheel .local/dist-b3-review/hardware_validation_lab_contracts-0.4.0-py3-none-any.whl` | **16 real installed Windows matrix cases passed**: CAN PASS/FAIL/ERROR; cooperative/forced timeout; descendants; crash/malformed/stdout+stderr overflow; memory/CPU exits; disk workload timeout; partial preparation; retained PASS with cleanup failure; explicit cooperative cancellation. Exit mapping and stop confirmation checked. `.local/b3-package-review.txt`; evidence `.local/b3-installed-ao0wegsu/` |
+| Existing `tests/b2_package_smoke.py` with new clean installation/review wheel | All seven comparator fixtures, stable report replay, existing-output preservation and header-override rejection passed. `.local/b3-comparator-regression.txt`; evidence `.local/b2-evidence-9ofgcahx/` |
+| Existing Ubuntu discovery/run check | WSL lists Ubuntu and existing Docker distributions; actual Ubuntu Python reports 3.12.3. No OS/WSL/Docker package installation or security change |
+| `wsl -d Ubuntu --exec python3 tests/b3_linux_smoke.py .local/dist-b3-review/hardware_validation_lab_contracts-0.4.0-py3-none-any.whl` | **15 actual Linux source/wheel smoke checks passed**: three CAN outcomes, nine process/failure/resource probes, cooperative cancel, monitored process count and actual symlink denial before launch. `.local/b3-linux-review.txt`; evidence `.local/b3-linux-91bp7_2j/`. This is source execution against the actual matching wheel, not a clean pip-installed Linux package/service |
+| `ruff check web contracts agent workloads tests`; compileall; `pip check` | Passed; no new runtime dependencies or broken requirements |
+| PostgreSQL Django check, makemigrations --check --dry-run, migrate --check | No system issues, no drift or pending migrations. No schema change |
+| Documentation/source checks | Passed: 14 Markdown files, 61 resolving local links, clean fences/whitespace, all 73 requirement IDs/11 gate markers. Changed-file text/credential-pattern scan (including new files) and git diff --check passed; no ignored runtime/secret files included. No browser review claimed; browser flow is unchanged |
+
+Native tests confirm actual root/descendant termination for the owned synthetic probes. Separate injected tests verify policy when stop confirmation is unavailable and when human-report persistence fails: defer cleanup/require reconciliation and preserve the primary outcome. Those injected failures are not physical termination/disk-outage evidence. Windows read-only owned fixture produces actual cleanup failure; evaluated PASS and report survive while CLI returns 2.
+
+Initial checks caught antivirus-created `_avast_` entries when child TEMP was redirected into the owned work directory. Preserved OS temp/monitoring behavior instead of disabling security or deleting unknown entries; early diagnostic leftovers stay private and are not passed evidence. Hardened launch with CREATE_SUSPENDED/Job Object association before any worker code, direct base-interpreter startup, and a separate plugin gate. Added raw bounded pipe reads to avoid buffered-read lock stalls, safe broken-pipe handling and independent incomplete-evidence status. Earlier intermediate builds/results are superseded by the review artifact/suite above.
+
+## Changed files and boundaries
+
+Added agent/process_tree.py, runner.py, runner_cli.py, worker.py, contracts/runner_v1.py, lab/test_runner.py, tests/b3_package_smoke.py, tests/b3_linux_smoke.py and [M2B_3.md](M2B_3.md). Updated pyproject to distribution 0.4.0/hvl-runner, workload verifier/test ZIP metadata for the new distribution and workflow/README/PLAN/M2B/REQUIREMENTS/architecture/security/decisions/status. CAN algorithm/report version remains 0.3.0; old installed environments/wheels remain intact, with no silent historical manifest upgrade. No UI, auth, model, migration or live project/account/agent credential changes.
+
+Windows hard controls cover job-wide committed memory, aggregate user CPU time, active count and CPU rate. Linux controls are per-process RLIMIT_AS/CPU/FSIZE, group monitoring/SIGKILL and /proc observations; CPU time rounds to whole seconds, no CPU-rate throttle/cgroup/aggregate hard process/memory control or hostile session-escape isolation is claimed. Working-disk total is a monitored soft budget with polling overshoot; parent staging is bounded before writes, Linux has a per-file hard cap. OS temp/monitoring activity is outside that directory budget. These are trusted installed-plugin controls, not an untrusted-code sandbox. CLI validates only explicit local paths; backend clients cannot select host paths/commands.
+
+`quarantine_required` is a local report flag preventing a clean CLI exit, not SQL quarantine or release. Zero observed processes does not establish hardware readiness. Root exit alone is insufficient. Unknown termination defers cleanup, retains the work directory and never authorizes reuse. Unknown files/reparse changes are preserved rather than recursively deleted. Comparison outcome remains separate from evidence/cleanup status.
+
+All observed native smoke trees were confirmed stopped. Normal acquired work files were cleaned. Intentionally read-only cleanup-failure evidence and early unknown host-temp entries remain under ignored .local; no secret files were staged or deleted. User webserver/PostgreSQL were left under their control; no new long-running service/worker was installed. Ubuntu was used through its existing WSL configuration, not terminated/reconfigured. Docker/hosted CI, macOS, Linux pip-install/service behavior, crash/restart journaling and real hardware remain unverified/out of scope.
+
+Five-minute demo, full manual test steps/expected exits, platform limits and three optional exercises are in [M2B_3.md](M2B_3.md). Next exact action: finish the explicitly approved M2B.3 commit/push/merge and verify remote main. M2B.4 requires its own continuation.
+
+---
+
 # Current M2B.2 checkpoint - 2026-11-05 (America/Los_Angeles)
 
 ## Outcome, authorization and next gate
