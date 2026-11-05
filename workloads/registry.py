@@ -35,7 +35,7 @@ def verify_wheel(path):
             if len(metadata) != 1 or wheel.getinfo(metadata[0]).file_size > 65536:
                 raise ContractError("Invalid release metadata.")
             lines = wheel.read(metadata[0]).decode('utf-8').splitlines()
-            if lines.count('Name: hardware-validation-lab-contracts') != 1 or lines.count('Version: 0.4.0') != 1:
+            if lines.count('Name: hardware-validation-lab-contracts') != 1 or lines.count('Version: 0.5.0') != 1:
                 raise ContractError("Unsupported release package/version.")
     except (OSError, zipfile.BadZipFile, KeyError, UnicodeError) as exc:
         raise ContractError("Unable to verify workload wheel.") from exc

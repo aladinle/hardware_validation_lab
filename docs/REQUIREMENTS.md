@@ -1,10 +1,10 @@
 # Unified requirements and evidence checklist
 
-Reconciled 2026-11-03 from original user brief sections 1-8 and LabFlow PDF pages 1-18; status columns updated after M2B.3 local implementation. [PLAN.md](PLAN.md) is the only roadmap. This checklist maps coverage/evidence, not implementation authorization. Actual results are in STATUS and [M2A.md](M2A.md). M2A has actual Windows/PostgreSQL 18.1 submission evidence; M2B.2 adds measured local synthetic file analysis; platform execution, physical hardware and hosted CI remain unmeasured.
+Reconciled 2026-11-03 from original user brief sections 1-8 and LabFlow PDF pages 1-18; status columns updated after M2B.4 local implementation. [PLAN.md](PLAN.md) is the only roadmap. This checklist maps coverage/evidence, not implementation authorization. Actual results are in STATUS and [M2A.md](M2A.md). M2A has actual Windows/PostgreSQL 18.1 submission evidence; M2B.2 adds measured local synthetic file analysis; platform execution, physical hardware and hosted CI remain unmeasured.
 
 Legend: **local** = implemented locally with recorded portal checks; **partial** = some implementation/configuration/evidence; **planned** = not implemented; **conditional** = requires equipment, credentials or explicit deployment authorization. Planned requirements remain required at their assigned gate unless explicitly revised later.
 
-M2B work is decomposed into eight tasks (.1-.3 implemented locally; .4-.8 planned) in [M2B.md](M2B.md). Its parent-gate coverage table maps those tasks to existing requirements without removing any parent acceptance checks. Identity/contact evidence is in [M2B_1.md](M2B_1.md).
+M2B work is decomposed into eight tasks (.1-.4 implemented locally; .5-.8 planned) in [M2B.md](M2B.md). Its parent-gate coverage table maps those tasks to existing requirements without removing any parent acceptance checks. Identity/contact evidence is in [M2B_1.md](M2B_1.md).
 
 ## Product, workflow and access
 
@@ -49,7 +49,7 @@ M2B work is decomposed into eight tasks (.1-.3 implemented locally; .4-.8 planne
 | B11 | Separate scheduler, assignment durable before delivery, no HTTP hardware work | M2B/M3: restart/ack loss with real processes | planned |
 | B12 | PostgreSQL short transactions/resource lock order/uniqueness, claim token/epoch, stale finalization/release denied | M2B basic/M3 competing schedulers | planned |
 | B13 | Independent heartbeat/lease/ack deadlines; suspect/offline/quarantine; no reuse on contact expiry | M3: old process survives disconnect, second allocation refused | partial: idle contact timestamps only; deadlines/offline detection/leases/quarantine planned |
-| B14 | Local agent SQLite journal/spool, accepted assignment/epoch/process persisted before launch, dedup/reconciliation | M2B/M3: restart/lost ACK no duplicate launch | planned |
+| B14 | Local agent SQLite journal/spool, accepted assignment/epoch/process persisted before launch, dedup/reconciliation | M2B/M3: restart/lost ACK no duplicate launch | local ledger: durable acceptance/intent, PID identity, retained sealed spool, real crash/replay checks and manual ACK simulation; backend transport/reconciliation authority remains planned |
 | B15 | Supervised bounded runtime/output/CPU/memory/disk, cooperative cancel/grace/process-tree escalation/owned cleanup | M2B/M5: partial prepare/error/cancel/descendants on actual Windows/Linux | partial: standalone Windows Job Object and Ubuntu WSL group/resource checks; disk monitoring/platform differences recorded; hardware/services planned |
 | B16 | Bounded configured transient infrastructure retry/backoff; preserve first failure/every attempt/rerun lineage, no hidden PASS/non-idempotent rerun | M3/M4: eligibility/history tests | planned |
 | B17 | Compatible FIFO/fairness, device/station/global/agent concurrency, shared USB/power/interface/CPU/storage resources | M3: contention and independent parallelism | planned |
@@ -63,7 +63,7 @@ M2B work is decomposed into eight tasks (.1-.3 implemented locally; .4-.8 planne
 | ID | Requirement | Gate and acceptance evidence | Current status |
 | --- | --- | --- | --- |
 | T01 | Stable adapter/plugin/context/result contracts, installed manifest/schema/version/capability registry | M2B: second plugin without scheduler rewrite | partial: installed CAN registry/contracts and prepare/execute/collect/cleanup runner; second plugin planned |
-| T02 | Simulator attach/detach/PASS/assertion FAIL/timeout/malformed/crash/disconnect/lost ACK/upload/cleanup failure | M2B/M3: deterministic injection matrix | partial: local runner crash/timeout/malformed/output/cancel/cleanup probes; attach/disconnect/journal/upload loss remain planned |
+| T02 | Simulator attach/detach/PASS/assertion FAIL/timeout/malformed/crash/disconnect/lost ACK/upload/cleanup failure | M2B/M3: deterministic injection matrix | partial: local runner crash/timeout/malformed/output/cancel/cleanup probes; local journal/reply-loss checks added; attach/disconnect/real upload loss remain planned |
 | T03 | CAN file comparison with explicit expected/actual roles, approved reference-header removal, strict hex/nonempty payload | M2B: pass/substitution/missing/extra/invalid/empty/leading insertion fixtures | local: actual installed synthetic file comparator and known-answer checks; no physical CAN |
 | T04 | Normalized payload byte offsets, overlap mismatch plus missing/extra counts, raw/checksummed inputs and versioned reports | M2B/M4: known-answer JSON/human/JUnit | partial: local deterministic JSON/human/raw-normalized evidence; backend delivery/JUnit planned |
 | T05 | Readiness identity/capability/OS/version/free-space/dependency checks; serial identifies not authenticates | M2B/M5: registration/reconnect upsert/no duplicate devices | planned |

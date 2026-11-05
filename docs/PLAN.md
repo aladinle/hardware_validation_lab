@@ -6,7 +6,7 @@ Reconciled 2026-11-03. Project name: **Hardware Validation Lab**. LabFlow is the
 
 Combine the original user brief (sections 1-8) with LabFlow Detailed Implementation Plan (18 pages, planning version 1.0, 2026-11-03). Preserve the original Django stack, four human roles, project isolation, hardware safety and later technology portfolio. Add the PDF's CAN comparison, versioned API, durable submissions, agent journal/reconciliation, CI CLI/reporting, schedules and measurable failure-injection gates. Its copy-ready prompt is reference material, not separate implementation authority.
 
-**The user authorized M2B.3 on its own feature branch and requires explicit approval before merge to main. M2A and M2B.1-.3 are implemented locally with recorded limits. Preserve existing work; M2B.4 and later need a new continuation.** A request to continue means the next individual gate below, not the remaining roadmap. No automatic commits/pushes/merges, remote creation, publication, purchases, external accounts, privileged installs, security changes or extra agents.
+**The user authorized M2B.4 on its own feature branch; merge requires explicit user approval. M2A and M2B.1-.4 are implemented locally with recorded limits. Preserve existing work; M2B.5 and later need a new continuation.** A request to continue means the next individual gate below, not the remaining roadmap. No automatic commits/pushes/merges, remote creation, publication, purchases, external accounts, privileged installs, security changes or extra agents.
 
 Initial target: one lab, one or two stations, one device per job, independent parallel jobs, desktop and phone browsers. Projects remain authorization boundaries within a lab. Coordinated multi-device work is retained for its own later gate. No Apple affiliation/certification or validation on unavailable Mac hardware. No shared human credentials, invented results or claimed physical validation from simulation.
 
@@ -60,7 +60,7 @@ Typed shared `/api/v1` schemas cover authorized devices/tests/capabilities; jobs
 
 ## Milestones and acceptance gates
 
-Each gate stops for review. Status labels: planned, implemented locally, simulator-tested, real-device-tested, externally integrated, blocked. A document/configuration is not an integration. M0/M1/M2A and M2B.1-.3 identity/contact, synthetic comparison and local runner are implemented locally with recorded limits; M2B.4 onward remains planned. M2A/M2B.1 have real PostgreSQL 18.1 evidence; Docker/CI configuration is not externally integrated. Only standalone local synthetic execution exists; no platform dispatch or hardware execution exists.
+Each gate stops for review. Status labels: planned, implemented locally, simulator-tested, real-device-tested, externally integrated, blocked. A document/configuration is not an integration. M0/M1/M2A and M2B.1-.4 identity/contact, synthetic comparison, runner and local journal are implemented locally with recorded limits; M2B.5 onward remains planned. M2A/M2B.1 have real PostgreSQL 18.1 evidence; Docker/CI configuration is not externally integrated. Only standalone local synthetic execution exists; no platform dispatch or hardware execution exists.
 
 ### M0 - foundation (existing)
 
@@ -80,7 +80,7 @@ Add typed v1 contracts, authorized catalog/devices/compatibility, initial projec
 
 ### M2B - simulator MVP and native local agent
 
-M2B has **eight separately reviewed tasks, M2B.1-M2B.8**, in [M2B.md](M2B.md): agent identity/protocol; CAN plugin; bounded runner; durable journal; PostgreSQL assignment/polling; results/evidence; simulation/cancellation failures; portal integration/final review. M2B.1-.3 are implemented locally (see [M2B_1.md](M2B_1.md), [M2B_2.md](M2B_2.md) and [M2B_3.md](M2B_3.md)); .4-.8 remain planned. This decomposition preserves every parent requirement below. M2B.3 merge requires user approval; the next implementation task is M2B.4 only after a new continuation. No platform dispatch or full M2B completion is claimed.
+M2B has **eight separately reviewed tasks, M2B.1-M2B.8**, in [M2B.md](M2B.md): agent identity/protocol; CAN plugin; bounded runner; durable journal; PostgreSQL assignment/polling; results/evidence; simulation/cancellation failures; portal integration/final review. M2B.1-.4 are implemented locally (see [M2B_1.md](M2B_1.md), [M2B_2.md](M2B_2.md), [M2B_3.md](M2B_3.md) and [M2B_4.md](M2B_4.md)); .5-.8 remain planned. This decomposition preserves every parent requirement below. M2B.4 merge requires user approval; the next implementation task is M2B.5 only after a new continuation. No platform dispatch or full M2B completion is claimed.
 
 Create separate installable native Python agent, explicit enrollment, authenticated polling/heartbeat/events/results, journal/spool and separate basic single-scheduler process. Use PostgreSQL exclusive allocations/epochs from the outset, one device/job with required shared resources reserved together; competing-scheduler recovery is not proven until M3. Compose gains scheduler; Windows agent runs outside containers. Dispatch binds current authority and approved version/plugin digest.
 

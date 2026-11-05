@@ -50,3 +50,10 @@
 - On Windows launch suspended, attach a Job Object and resume before the plugin gate. Use native aggregate controls and explicit active-process accounting. Preserve host monitoring/temp behavior. Linux uses documented per-process resource limits/groups and records weaker monitoring scopes instead of implying cgroup isolation.
 - Keep primary outcome separate from cleanup/evidence/termination. Preserve evaluated PASS/FAIL if cleanup fails, but return exit 2 and require reconciliation. Timeout/cancel and OS-limit infrastructure errors do not become assertion FAIL. Unknown termination never authorizes reuse or physical readiness.
 - Build distribution 0.4.0 with unchanged CAN algorithm version 0.3.0 and new artifact digest. Keep old installed releases separate. User requested work on a new branch and explicit approval before main merge; no automatic merge or M2B.4 continuation.
+
+## M2B.4 decisions - 2026-11-05
+
+- Local SQLite WAL/FULL is the agent journal only; PostgreSQL remains platform authority. Persist execution ID/epoch/canonical context, local scope, supervisor and launch intent before creation; record child creation identity before permitting plugin work. Replays never execute again, even after original source files vanish.
+- Seal and flush retained evidence before committing SQL completion. Recover a verified sealed completion after the SQL gap; otherwise retain uncertainty/local scope. A missing/reused PID, age, timeout or ACK cannot establish stopped descendants/hardware readiness. Do not introduce an unsafe force-clear switch.
+- Bound records and logical spool admission; retain tombstones/evidence even after repeated manual local ACK. Reject capacity exhaustion, corruption, stale epochs and conflicting bytes instead of replacing history. Backend upload/receipt authentication and dispatch stay at their gates.
+- Native Windows clean-install and Ubuntu source crash/replay checks are distinct evidence. No exactly-once physical action, OS power-cut/directory durability, malicious OS protection or hosted CI claim. User authorized M2B.4 work on a new branch; main merge still needs approval.

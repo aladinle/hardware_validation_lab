@@ -27,10 +27,12 @@ class CancelledBeforeLaunch(Exception):
 def safe_path(path):
     path = Path(path).absolute()
     for part in (path, *path.parents):
-        if part.exists() or part.is_symlink():
+        try:
             info = part.lstat()
-            if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 1024:
-                raise ContractError("Local paths must not traverse links/reparse points.")
+        except FileNotFoundError:
+            continue  # SQLite WAL/SHM and other owned files can disappear.
+        if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 1024:
+            raise ContractError("Local paths must not traverse links/reparse points.")
     return path
 
 
@@ -169,9 +171,9 @@ def validate_output(raw, *, probe, staged, digest, parameters=None):
     return report
 
 
-def run_can(manifest, expected, actual, wheel, output_dir, *, parameters, limits=Limits(), cancel=None):
+def run_can(manifest, expected, actual, wheel, output_dir, *, parameters, limits=Limits(), cancel=None, _observer=None):
     return _run(manifest, {"expected": expected, "actual": actual}, wheel, output_dir,
-                parameters=parameters, limits=limits, cancel=cancel, probe=None)
+                parameters=parameters, limits=limits, cancel=cancel, probe=None, observer=_observer)
 
 
 def run_probe(scenario, output_dir, *, limits=Limits(), cancel=None):
@@ -180,14 +182,14 @@ def run_probe(scenario, output_dir, *, limits=Limits(), cancel=None):
     return _run(None, {}, None, output_dir, parameters={}, limits=limits, cancel=cancel, probe=scenario)
 
 
-def _run(manifest, inputs, wheel, output_dir, *, parameters, limits, cancel, probe):
+def _run(manifest, inputs, wheel, output_dir, *, parameters, limits, cancel, probe, observer=None):
     limits.validate()
     cancel = cancel if cancel is not None else threading.Event()
     output = safe_path(output_dir)
     output.mkdir(mode=0o700, exist_ok=False)
     work = output / "work"
     work.mkdir(mode=0o700)
-    result = {"schema_version": 1, "runner_version": "0.4.0", "python_version": sys.version.split()[0],
+    result = {"schema_version": 1, "runner_version": "0.5.0", "python_version": sys.version.split()[0],
               "source": "runner_probe" if probe else "simulated", "probe": probe,
               "outcome": "ERROR", "evaluation_status": "NOT_EVALUATED", "reason": "SETUP_ERROR",
               "termination_confirmed": True, "cleanup_status": "NOT_STARTED", "quarantine_required": False,
@@ -243,15 +245,21 @@ def _run(manifest, inputs, wheel, output_dir, *, parameters, limits, cancel, pro
         result["process_id"] = process.pid
         tree.attach(process)
         attached = True
+        if observer is not None:
+            observer('spawned', process)
         tree.resume(process)
         stdout, stderr = Capture(process.stdout, limits.stdout_bytes, overflow), Capture(process.stderr, limits.stderr_bytes, overflow)
         request = {"schema_version": 1, "manifest": manifest, "parameters": parameters, "probe": probe, "limits": asdict(limits)}
         payload = ("GO\n" + json_report(request)).encode("utf-8")
         if len(payload) > 65536:
             raise ContractError("Worker request exceeds bound.")
+        if observer is not None:
+            observer('gate', process)
         process.stdin.write(payload)
         process.stdin.flush()
         gate_open = True
+        if observer is not None:
+            observer('launched', process)
         deadline = time.monotonic() + limits.wall_seconds
         reason = None
         while process.poll() is None:

@@ -2,6 +2,10 @@
 
 Scope follows the [unified roadmap](PLAN.md) and [requirements checklist](REQUIREMENTS.md). M2A adds durable queued submission; M2B.1 adds native agent identity and idle contact. M2B.2 adds explicit local synthetic file analysis; no platform workload dispatch or hardware execution exists. Detailed contracts/setup are in [M2A.md](M2A.md).
 
+## Implemented in M2B.4
+
+`agent/journal.py` adds a root-scoped SQLite WAL/FULL ledger, canonical immutable delivery identity, local overlap exclusion and short transactions. Acceptance/launch intent precede process creation; observer hooks persist worker birth identity before the plugin gate. Duplicate delivery never invokes the runner. A flushed checksummed spool seal precedes SQL completion, allowing safe completion-commit recovery; missing/unverifiable completion stays uncertain with scope held. Local ACK is explicitly a demonstration, not a backend upload receipt, and deletes no evidence/dedup record. No SQL scheduling authority or dispatch is added. See [M2B_4.md](M2B_4.md); main merge awaits explicit approval.
+
 ## Implemented in M2B.3
 
 `agent/runner.py` stages bounded local files, starts a fixed child behind containment/launch gates, drains capped output and validates/collects reports. Windows uses suspended launch plus Job Objects with hard job memory/CPU/process controls; Linux uses a session/group, worker resource limits and monitored group/disk budgets. Their scopes differ and are recorded in run.json. Cooperative cancellation precedes bounded escalation and observed stop confirmation. Cleanup is restricted to exact acquired file identities; uncertainty defers cleanup and sets a local quarantine-required flag. No SQL allocation/quarantine or journal is implemented. The local CLI is separate from network heartbeats; it cannot execute queued jobs. See [M2B_3.md](M2B_3.md). User approved the M2B.3 merge into main; M2B.4 remains planned.
