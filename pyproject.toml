@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools==84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hardware-validation-lab-contracts"
+version = "0.2.0"
+description = "Typed contracts and native identity/heartbeat agent for Hardware Validation Lab"
+requires-python = ">=3.11"
+
+[tool.setuptools]
+packages = ["contracts", "agent"]
+
+[project.scripts]
+hvl-agent = "agent.__main__:main"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 140
+
+[tool.ruff.lint]
+select = ["E9", "F63", "F7", "F82"]

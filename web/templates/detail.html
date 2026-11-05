@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h1>{{ record.name }}</h1><section class="card card-form"><p>Catalog record only. No execution or measurements have been recorded.</p><p>Record ID: <code>{{ record.pk }}</code></p>{% if record.source %}<p>Source: {{ record.get_source_display }} · Not registered</p>{% endif %}</section>{% endblock %}

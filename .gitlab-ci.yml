@@ -1,0 +1,46 @@
+image: python:3.11-slim
+
+services:
+  - name: postgres:16
+    alias: postgres
+
+variables:
+  POSTGRES_DB: hardware_lab_ci
+  POSTGRES_USER: lab_ci
+  POSTGRES_PASSWORD: $LAB_CI_POSTGRES_PASSWORD
+  LAB_LOCAL_DEV: "1"
+  LAB_DB: postgres
+  LAB_SECRET_KEY: $LAB_CI_SECRET_KEY
+  PGDATABASE: hardware_lab_ci
+  PGUSER: lab_ci
+  PGPASSWORD: $LAB_CI_POSTGRES_PASSWORD
+  PGHOST: postgres
+  PGPORT: "5432"
+
+stages: [verify, package]
+
+verify:
+  stage: verify
+  script:
+    - pip install -r requirements.lock
+    - mkdir -p .local/ci-results
+    - python web/manage.py migrate --noinput
+    - python web/manage.py check
+    - python web/manage.py makemigrations --check --dry-run
+    - ruff check web contracts agent tests
+    - python web/manage.py test lab -v 2 > .local/ci-results/tests.log 2>&1
+    - pip check
+  artifacts:
+    when: always
+    paths: [.local/ci-results/]
+
+package:
+  stage: package
+  script:
+    - pip install -r requirements.lock
+    - python -m build --no-isolation
+  artifacts:
+    paths: [dist/]
+
+# Configure masked LAB_CI_POSTGRES_PASSWORD and LAB_CI_SECRET_KEY outside Git.
+# No physical runner jobs or real lab credentials are configured in M2A.

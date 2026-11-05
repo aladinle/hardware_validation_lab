@@ -1,0 +1,16 @@
+{% extends 'base.html' %}{% block content %}
+<h1>Test authoring & approval</h1>
+<div class="notice">CAN comparison contract metadata only. Published snapshots are immutable; approval permits queuing, not execution in this milestone.</div>
+{% if notice %}<p role="status">{{ notice }}</p>{% endif %}
+<section class="card card-form"><h2>Save a draft</h2><form method="post">{% csrf_token %}<input type="hidden" name="action" value="save">{{ form.as_p }}<button>Save draft</button></form></section>
+{% for draft in drafts %}
+<section class="card card-form"><h2>{{ draft.name }}</h2><p>Draft ID: <code>{{ draft.pk }}</code> · Reference header: {{ draft.draft_header_bytes }} bytes</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="action" value="publish"><input type="hidden" name="definition_id" value="{{ draft.pk }}"><button>Publish new immutable version</button></form>
+{% for version in draft.versions.all %}
+<article class="record"><div><strong>Version {{ version.number }}</strong><p>ID: <code>{{ version.pk }}</code></p><p>Manifest checksum: <code>{{ version.manifest_sha256 }}</code></p>
+{% for approval in version.approvals.all %}{% if not approval.revoked_at %}<span class="tag">Approved</span>{% endif %}{% empty %}<span class="tag">Approval required</span>{% endfor %}</div>
+{% if is_manager %}<div><form method="post">{% csrf_token %}<input type="hidden" name="version_id" value="{{ version.pk }}"><button name="action" value="approve">Approve</button><button name="action" value="revoke">Revoke approval</button></form>
+<form method="post">{% csrf_token %}<input type="hidden" name="version_id" value="{{ version.pk }}"><label for="grant-member-{{ version.pk }}">Explicit version grant for member</label><select id="grant-member-{{ version.pk }}" name="member_id">{% for member in members %}<option value="{{ member.pk }}">{{ member.user.email }}</option>{% endfor %}</select><button name="action" value="grant">Grant version</button><button name="action" value="ungrant">Revoke version grant</button></form></div>{% endif %}
+</article>{% endfor %}</section>
+{% empty %}<p>No drafts yet.</p>{% endfor %}
+{% endblock %}

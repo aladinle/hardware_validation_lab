@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<section class="auth-card"><h1>No project access</h1><p>Your account has no active project memberships. Contact your administrator.</p><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="primary">Sign out</button></form></section>{% endblock %}
