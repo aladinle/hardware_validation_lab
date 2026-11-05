@@ -1,10 +1,10 @@
 # Unified requirements and evidence checklist
 
-Reconciled 2026-11-03 from original user brief sections 1-8 and LabFlow PDF pages 1-18; status columns updated after M2B.1 local implementation. [PLAN.md](PLAN.md) is the only roadmap. This checklist maps coverage/evidence, not implementation authorization. Actual results are in STATUS and [M2A.md](M2A.md). M2A has actual Windows/PostgreSQL 18.1 submission evidence; execution/simulator/physical/hosted CI remain unmeasured.
+Reconciled 2026-11-03 from original user brief sections 1-8 and LabFlow PDF pages 1-18; status columns updated after M2B.2 local implementation. [PLAN.md](PLAN.md) is the only roadmap. This checklist maps coverage/evidence, not implementation authorization. Actual results are in STATUS and [M2A.md](M2A.md). M2A has actual Windows/PostgreSQL 18.1 submission evidence; M2B.2 adds measured local synthetic file analysis; platform execution, physical hardware and hosted CI remain unmeasured.
 
 Legend: **local** = implemented locally with recorded portal checks; **partial** = some implementation/configuration/evidence; **planned** = not implemented; **conditional** = requires equipment, credentials or explicit deployment authorization. Planned requirements remain required at their assigned gate unless explicitly revised later.
 
-M2B work is decomposed into eight tasks (.1 implemented locally at review; .2-.8 planned) in [M2B.md](M2B.md). Its parent-gate coverage table maps those tasks to existing requirements without removing any parent acceptance checks. Identity/contact evidence is in [M2B_1.md](M2B_1.md).
+M2B work is decomposed into eight tasks (.1-.2 implemented locally; .3-.8 planned) in [M2B.md](M2B.md). Its parent-gate coverage table maps those tasks to existing requirements without removing any parent acceptance checks. Identity/contact evidence is in [M2B_1.md](M2B_1.md).
 
 ## Product, workflow and access
 
@@ -39,7 +39,7 @@ M2B work is decomposed into eight tasks (.1 implemented locally at review; .2-.8
 | B01 | Modular supported/pinned Python/Django and maintained primitives; minimal JS, no SPA absent measured need | M0 onward: compatibility/dependency checks | local |
 | B02 | PostgreSQL authoritative; reproducible Compose and non-container setup; SQLite never proves PostgreSQL races | M2A actual migrations/restart/health/readiness; M3 races | partial: real native PostgreSQL 18.1 tests/restart; Docker/PG16 unverified |
 | B03 | Linux/WSL2 backend and separate native Windows/Linux agent; do not presume USB passthrough | M2B/M5: native platform/environment labels | partial: independently installed Windows identity/contact process tested; Linux/hardware planned |
-| B04 | Installable packages/pyproject, one lock, shared typed/versioned API/report contracts | M2A/M2B/M4: clean install/build/schema tests | partial: typed v1 contracts/native agent package built and clean-installed; report/workload packages planned |
+| B04 | Installable packages/pyproject, one lock, shared typed/versioned API/report contracts | M2A/M2B/M4: clean install/build/schema tests | partial: typed v1 contracts/native agent package built and clean-installed; synthetic workload package/JSON-human reports verified; backend reports planned |
 | B05 | Project/Membership/TestDefinition/immutable TestVersion/TestApproval/TestGrant/Agent/Device/DeviceGrant | M1/M2A/M2B: migrations/version immutability/approval tests | local models: version/approval/grants and scoped Agent identity implemented; execution models remain later gates |
 | B06 | Job/Run/Attempt/Batch/Resource/Reservation/Lease/Measurement/Artifact/AuditEvent; service tokens/schedules/events/outbox | M2A-M7: SQL constraints/identity/ownership | partial: Job/Run/Batch/input Artifact/service models; attempts/resources/schedules/outbox planned |
 | B07 | Immutable actual/simulated/environment/device/firmware/hardware/software/test/plugin/agent/config/input/requester/time snapshots; UTC/local display/unknown stays unknown | M2A/M2B/M4: old reports unchanged after inventory edit; indexes and bounded logs | partial: immutable queued context/version/input snapshots; execution telemetry planned |
@@ -62,10 +62,10 @@ M2B work is decomposed into eight tasks (.1 implemented locally at review; .2-.8
 
 | ID | Requirement | Gate and acceptance evidence | Current status |
 | --- | --- | --- | --- |
-| T01 | Stable adapter/plugin/context/result contracts, installed manifest/schema/version/capability registry | M2B: second plugin without scheduler rewrite | planned |
+| T01 | Stable adapter/plugin/context/result contracts, installed manifest/schema/version/capability registry | M2B: second plugin without scheduler rewrite | partial: fixed installed CAN registry/contracts; second plugin/runner planned |
 | T02 | Simulator attach/detach/PASS/assertion FAIL/timeout/malformed/crash/disconnect/lost ACK/upload/cleanup failure | M2B/M3: deterministic injection matrix | planned |
-| T03 | CAN file comparison with explicit expected/actual roles, approved reference-header removal, strict hex/nonempty payload | M2B: pass/substitution/missing/extra/invalid/empty/leading insertion fixtures | planned; not physical CAN |
-| T04 | Normalized payload byte offsets, overlap mismatch plus missing/extra counts, raw/checksummed inputs and versioned reports | M2B/M4: known-answer JSON/human/JUnit | planned |
+| T03 | CAN file comparison with explicit expected/actual roles, approved reference-header removal, strict hex/nonempty payload | M2B: pass/substitution/missing/extra/invalid/empty/leading insertion fixtures | local: actual installed synthetic file comparator and known-answer checks; no physical CAN |
+| T04 | Normalized payload byte offsets, overlap mismatch plus missing/extra counts, raw/checksummed inputs and versioned reports | M2B/M4: known-answer JSON/human/JUnit | partial: local deterministic JSON/human/raw-normalized evidence; backend delivery/JUnit planned |
 | T05 | Readiness identity/capability/OS/version/free-space/dependency checks; serial identifies not authenticates | M2B/M5: registration/reconnect upsert/no duplicate devices | planned |
 | T06 | File/network/communication simulation; real network preconfigured local endpoint, bounded traffic | M2B/M5: remote target/unsupported capability/traffic rejection | planned |
 | T07 | Real storage only approved dedicated contained directory, bounded owned temporary files/checksum/capacity/free space/cleanup | M5: collision/traversal/symlink/reparse/unplug/cancel | planned |

@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.utils import timezone
 from contracts.v1 import ContractError, manifest, parse_submission
+from contracts.plugins import executable_manifest, validate_manifest, validate_parameters
 from .access import scope
 from .models import (Artifact, Batch, Device, DeviceGrant, Job, Membership, Project, Role, Run,
                      ServicePrincipal, ServiceToken, TestApproval, TestDefinition, TestGrant, TestVersion, User)
@@ -73,7 +74,7 @@ def artifact_visible(actor, artifact, user, role):
 
 
 @transaction.atomic
-def publish(actor, project_id, definition_id):
+def publish(actor, project_id, definition_id, *, workload_wheel=None):
     user, project, role, member, principal = locked_scope(actor, project_id)
     definition = TestDefinition.objects.filter(pk=definition_id, project=project).first()
     if definition is None:
@@ -81,6 +82,11 @@ def publish(actor, project_id, definition_id):
     if actor.principal_id or role not in {Role.ADMIN, Role.ENGINEER} or (role == Role.ENGINEER and definition.created_by_id != user.pk):
         raise Rejected("FORBIDDEN", "Only an authorized author can publish this draft.", 403)
     content = manifest(definition.draft_header_bytes)
+    if workload_wheel is not None:
+        # Only the trusted local management command supplies a wheel. Existing
+        # browser/API publication retains metadata-only semantics.
+        from workloads.registry import verify_wheel
+        content = executable_manifest(definition.draft_header_bytes, verify_wheel(workload_wheel))
     latest = definition.versions.order_by("-number").first()
     version = TestVersion.objects.create(definition=definition, number=latest.number + 1 if latest else 1,
                                          manifest=content, manifest_sha256=checksum(content), created_by=user)
@@ -163,11 +169,10 @@ def submit(actor, key, payload):
             raise Rejected("FORBIDDEN_DEVICE", f"Item {index} needs a device grant.", 403)
         if principal and (not principal.versions.filter(pk=version.pk).exists() or not principal.devices.filter(pk=device.pk).exists()):
             raise Rejected("FORBIDDEN_SERVICE_SCOPE", f"Item {index} is outside this service scope.", 403)
-        if not set(version.manifest["required_capabilities"]) <= set(device.capabilities):
+        spec, declared = validate_manifest(version.manifest)
+        if not set(spec.capabilities) <= set(device.capabilities):
             raise Rejected("NO_MATCHING_CAPABILITY", f"Item {index} has no matching device capability.")
-        declared = version.manifest["parameter_schema"]["properties"]["header_bytes"]["const"]
-        if item.parameters["header_bytes"] != declared:
-            raise ContractError(f"Item {index} must use the approved header policy.")
+        validate_parameters(spec.name, item.parameters, declared_header=declared)
         inputs = []
         for artifact_id in (item.expected_artifact_id, item.actual_artifact_id):
             artifact = Artifact.objects.filter(pk=artifact_id, project=project).first()

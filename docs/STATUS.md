@@ -1,3 +1,38 @@
+# Current M2B.2 checkpoint - 2026-11-05 (America/Los_Angeles)
+
+## Outcome, authorization and next gate
+
+**M2B.2 is implemented locally and its checks passed.** User explicitly authorized feature/m2b.2_synthetic-CAN-file-comparison work and merge into main after completion. GitHub origin is https://github.com/aladinle/hardware_validation_lab.git; baseline main/feature were 219b798 with a clean tree. Authorized commit/push/merge is the remaining handoff action; final remote SHA verification is reported in the chat/Git history. No force push or history replacement is intended. Stop before M2B.3, which requires a new continuation. The entire M2B milestone has not passed.
+
+The installed pure comparator handles explicit synthetic expected/actual files, fixed reference-header policy, strict byte-pair grammar/nonempty payloads, positional overlap/length differences, raw+normalized checksummed evidence and deterministic schema-versioned JSON/human reports. A fixed plugin registry rejects unknown code/fields/policy/package identity. New immutable SQL versions can bind to the real wheel, with separate approval and grants. Historical M2A versions and queued snapshots remain unchanged; new submissions remain queued. Native agent contact is still idle only. No runner, journal, scheduler/dispatch, backend result ingestion, physical capture or hardware readiness was implemented.
+
+## Actual checks and commands
+
+| Check | Actual result |
+| --- | --- |
+| Initial git status/branches and verified-TLS fetch | Clean feature/main at 219b798; no concurrent remote changes at inspection |
+| Final `scripts/postgres-local.ps1 -Action test` with LAB_B2_REVIEW_WHEEL pointing at the final actual wheel | **112 tests passed in 27.837s, no skips**, `.local/b2-tests-release.txt`; all 93 baseline regressions plus 19 new comparator/registry/publication cases |
+| PostgreSQL publication using the actual built artifact | New immutable package-bound version; approval and version grant each required separately; old metadata manifest and old queued job snapshot retained; new job remains queued; unauthorized authors and missing wheel denied |
+| `python -m build --no-isolation --sdist-extract-dir .local/build-b2-release --outdir .local/dist-b2-release` | Source distribution and 0.3.0 wheel built; `.local/b2-build-release.txt` |
+| Actual final wheel SHA-256 | `d7a9ac9d3b54603c443fa8ac8aea50c7892b3876a38f9e01d73e009ab329b87b` |
+| Fresh `.local/b2-plugin-venv` offline no-deps installation and final reinstall | Installed contracts/agent/workloads; no Django dependency |
+| `tests/b2_package_smoke.py --python .local/b2-plugin-venv/Scripts/python.exe --wheel .local/dist-b2-release/hardware_validation_lab_contracts-0.3.0-py3-none-any.whl` | All seven real CLI fixtures passed: match -> PASS/0; substitution/missing/extra/insertion -> FAIL/1; invalid/empty -> ERROR/2. Imports checked from outside checkout with Django absent. Matching real digest, deterministic report replay, existing-output preservation and header-override rejection passed. `.local/b2-package-smoke-release.txt`; evidence retained in `.local/b2-evidence-a8owkzv9/` |
+| `ruff check web contracts agent workloads tests`, compileall, `pip check` | Passed; no broken requirements or new runtime dependencies |
+| Django check, makemigrations --check --dry-run, migrate --check on PostgreSQL | No system issues, no model drift, no pending migrations; no schema migration needed |
+| Documentation checks | 13 Markdown files, 53 resolving local links, clean fences/whitespace, all 73 requirement IDs and 11 gates present |
+
+Initial actual-wheel verification exposed CRLF metadata handling that the unit ZIP fixture did not cover. Fixed metadata parsing to handle either line ending and updated the fixture before the final build/suite. Prior 110-test pass did not count as final wheel evidence. Test-only ZIP fixtures are labeled as such; final publication checks used the actual distribution. Earlier source artifact digests are superseded by the final digest above, not silently reused.
+
+## Scope, changed files and limitations
+
+Added contracts/plugins.py, workloads package (pure comparator, registry, explicit local CLI), tests/b2_package_smoke.py, lab/test_can_plugin.py, publish_can_workload management command, six synthetic fixtures and M2B_2 guide. Added .gitattributes to preserve LF Python/fixture bytes across checkout/merge for artifact verification. Updated contracts/v1.py parameter validation, submissions.py publication/manifest contract checks, pyproject package/entry point, GitLab lint scope, README/AGENTS and roadmap/requirements/architecture/security/decisions/status. No application UI or auth changes, migration or dependency additions. No user live test version/approval/grant, account or agent credential was mutated by this task. PostgreSQL checks used dedicated test records/databases; the user's webserver/cluster were left running under their control.
+
+The wheel identity check is a local installed-code/artifact consistency check, not signing, isolation or remote attestation. The CLI trusts operator-supplied local files/manifest; its candidate manifest is not SQL approval. Raw input bound is 1 MiB per role; only 100 difference details are emitted but counts cover all positions. Reports are synthetic local analysis, not persisted platform attempts or real hardware outcomes. Runtime supervision/cancel/resource limits, output delivery/retention, second plugins, JUnit, Linux/macOS, Docker and hosted CI remain future/unverified. No new browser review is claimed because this task changes no browser flow.
+
+Five-minute demo, commands, expected exits and three optional exercises: [M2B_2.md](M2B_2.md). Next exact implementation action after review and a new continuation: M2B.3 bounded local subprocess runner only. Do not enable queued job dispatch.
+
+---
+
 # M2B.1 user demo review and GitHub preparation - 2026-11-05
 
 User confirmed administrator browser login and the guided M2B.1 demo: enrollment, authenticated idle contact, rotation/credential replacement, revocation, disable/reenroll, and single-use enrollment replay rejection followed by successful contact with the valid state. These are user-reported manual outcomes, separate from the recorded 93-test PostgreSQL suite. Hardware execution/readiness remain unavailable; stop before M2B.2.

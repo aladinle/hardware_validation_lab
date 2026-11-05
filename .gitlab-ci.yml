@@ -27,7 +27,7 @@ verify:
     - python web/manage.py migrate --noinput
     - python web/manage.py check
     - python web/manage.py makemigrations --check --dry-run
-    - ruff check web contracts agent tests
+    - ruff check web contracts agent workloads tests
     - python web/manage.py test lab -v 2 > .local/ci-results/tests.log 2>&1
     - pip check
   artifacts:

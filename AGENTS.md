@@ -3,10 +3,10 @@
 Read this file and docs/STATUS.md before continuation; then docs/PLAN.md and relevant implementation.
 
 - Canonical roadmap: docs/PLAN.md, reconciled 2026-11-03; docs/REQUIREMENTS.md is its coverage/evidence checklist. Original/PDF milestone numbers are historical; use PLAN's crosswalk.
-- Active scope: M2B.1 identity/idle contact implemented locally, now at review. Read docs/M2B_1.md and STATUS for actual checks/limits. Stop here; M2B.2+ requires a new continuation. No dispatch, scheduler, CAN plugin, execution journal or workload execution exists yet.
-- M2B has eight tasks in docs/M2B.md. .1 is locally implemented; .2-.8 are planned. After review, a new "continue" starts the next unfinished task (.2), not all of M2B. Stop at each task's gate; eight tasks do not mean eight sessions.
-- Preserve work; inspect Git status first. Current feature branch: codex/m0-m1-portal. No automatic commits, pushes, merges, publication, account creation with external services, spending, or host security changes.
-- No additional agents unless the user requests them. No remote repository is assumed.
+- Active scope: M2B.2 synthetic file comparator implemented locally; user authorized its feature branch and merge to main after checks. Read docs/M2B_2.md and STATUS. Stop before M2B.3; no runner, dispatch, scheduler, journal or hardware execution exists.
+- M2B has eight tasks in docs/M2B.md. .1-.2 are locally implemented; .3-.8 are planned. After review, a new "continue" starts the next unfinished task (.3), not all of M2B. Stop at each task's gate; eight tasks do not mean eight sessions.
+- Preserve work; inspect Git status first. M2B.2 feature branch: feature/m2b.2_synthetic-CAN-file-comparison; main is the primary branch. The user authorized commit/push/merge for this task; do not infer authorization for later tasks. No automatic commits, pushes, merges, publication, account creation with external services, spending, or host security changes.
+- No additional agents unless the user requests them. GitHub origin: https://github.com/aladinle/hardware_validation_lab.git. Use verified TLS; per-command Windows schannel works without changing host trust settings.
 - Django server templates and minimal JavaScript; SQLite is quick-start only. PostgreSQL is integration authority. Never claim PostgreSQL scheduling correctness from SQLite tests.
 - Keep Django ORM/migrations/auth; do not migrate to FastAPI/SQLAlchemy/Alembic to match the PDF. Add typed v1 API/contracts and native agent packages incrementally. PDF execution_id maps to Attempt ID; use PLAN's canonical lifecycle/outcome/evaluation mapping.
 - Invite-only accounts; project roles and explicit grants; deny by default; scope both list and direct object access. Use Django sessions, password validation, CSRF and ORM transactions. Security mutations must create audit events.

@@ -1,6 +1,10 @@
 # Architecture
 
-Scope follows the [unified roadmap](PLAN.md) and [requirements checklist](REQUIREMENTS.md). M2A adds durable queued submission; M2B.1 adds native agent identity and idle contact. No workload execution has been implemented. Detailed contracts/setup are in [M2A.md](M2A.md).
+Scope follows the [unified roadmap](PLAN.md) and [requirements checklist](REQUIREMENTS.md). M2A adds durable queued submission; M2B.1 adds native agent identity and idle contact. M2B.2 adds explicit local synthetic file analysis; no platform workload dispatch or hardware execution exists. Detailed contracts/setup are in [M2A.md](M2A.md).
+
+## Implemented in M2B.2
+
+Installed `workloads/` provides a pure bounded CAN payload comparator, fixed registry and explicit local CLI, with shared `contracts/plugins.py` schemas/capabilities. It produces deterministic schema-versioned JSON/human evidence; raw data is recoverable from hex, offsets refer to normalized payload and mismatch totals remain complete with bounded details. Actual built-wheel SHA-256 and matching installed modules bind a new immutable version. Trusted local publication creates a new version, never mutates historical metadata versions; approval/grants remain separate. HTTP workers still only queue; no runner, dispatch or result ingestion exists. See [M2B_2.md](M2B_2.md).
 
 ## Implemented in M2B.1
 

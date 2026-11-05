@@ -54,11 +54,9 @@ def parse_submission(value) -> Submission:
     items = []
     for raw in value["items"]:
         exact_keys(raw, {"version_id", "device_id", "expected_artifact_id", "actual_artifact_id", "parameters"})
-        exact_keys(raw["parameters"], {"header_bytes"})
-        header = raw["parameters"]["header_bytes"]
-        if type(header) is not int or not 0 <= header <= 4096:
-            raise ContractError("header_bytes must be an integer from 0 to 4096.")
-        items.append(Item(**{key: identifier(raw[key]) for key in ("version_id", "device_id", "expected_artifact_id", "actual_artifact_id")}, parameters={"header_bytes": header}))
+        from .plugins import validate_parameters
+        parameters = validate_parameters("can_payload_compare", raw["parameters"])
+        items.append(Item(**{key: identifier(raw[key]) for key in ("version_id", "device_id", "expected_artifact_id", "actual_artifact_id")}, parameters=parameters))
     return Submission(identifier(value["project_id"]), tuple(items), queue_seconds, commit)
 
 
