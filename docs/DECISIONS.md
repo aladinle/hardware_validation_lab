@@ -36,3 +36,10 @@
 - Separate single-use enrollment from expiring runtime credentials. Hash SQL secrets, check scope on each request and require reenrollment after scope changes. Retain the latest 1,000 heartbeat IDs; exact retained replay does not refresh contact time.
 - Ship one installable contracts/native-agent distribution without Django dependencies. Keep verified TLS, loopback-only HTTP, redirect rejection and file-based secret input. Preserve host monitoring settings. A credential state file is not a durable execution journal.
 - Actual Windows native HTTP flow and PostgreSQL integration establish this task's local evidence. Linux/macOS, services, Docker, hosted CI, physical phone/hardware and later execution checks remain open. Stop before M2B.2.
+
+## M2B.2 decisions - 2026-11-05
+
+- Strict byte-pair grammar with contiguous pairs or ASCII space/tab/CR/LF; remove only the declared expected-reference header. Reject empty normalized payloads. Compare positionally, not by edit alignment; report overlap substitutions and tail missing/extra separately.
+- Retain bounded raw hex/checksum and normalized evidence, deterministic versioned reports and first 100 details with full totals. ERROR/NOT_EVALUATED is distinct from evaluated product FAIL. These are synthetic local reports, not SQL attempt/hardware outcomes.
+- Verify the actual wheel against installed modules before comparing/publishing; bind new immutable versions to its SHA-256. Existing metadata-only publications and queued snapshots remain unchanged; new approval/grants are required. No automatic activation or scheduler execution.
+- Keep a local explicit CLI for review and a Django-free clean install. The native agent remains identity/idle only. Runner supervision, journal, dispatch, backend delivery, second plugins and JUnit stay at their gates. User authorized this feature branch and merge to main after checks, not M2B.3.

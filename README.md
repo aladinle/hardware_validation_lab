@@ -1,8 +1,8 @@
 # Hardware Validation Lab
 
-Independent hardware validation infrastructure portfolio. The Django portal includes approved immutable catalog/input/queued requests plus **M2B.1 administrator-controlled native-agent enrollment and idle heartbeats**, verified on Windows/PostgreSQL. **No device execution, connected hardware, hardware measurements or results are implemented yet.** No Apple affiliation, certification, or Mac hardware validation is claimed.
+Independent hardware validation infrastructure portfolio. The Django portal includes approved immutable catalog/input/queued requests plus **M2B.1 administrator-controlled native-agent enrollment and idle heartbeats**, verified on Windows/PostgreSQL. **M2B.2 adds explicit local synthetic CAN file comparison and JSON/human reports. No platform dispatch, device execution, connected hardware or hardware measurements exist.** No Apple affiliation, certification, or Mac hardware validation is claimed.
 
-The [unified roadmap](docs/PLAN.md) and [requirements checklist](docs/REQUIREMENTS.md) map requirements to evidence. See [M2A setup/API](docs/M2A.md), [M2B.1 native-agent setup/demo](docs/M2B_1.md) and [current checkpoint](docs/STATUS.md). M2B.1 is at review; the next unfinished task is M2B.2, which requires a new continuation. A roadmap entry does not mean the feature exists.
+The [unified roadmap](docs/PLAN.md) and [requirements checklist](docs/REQUIREMENTS.md) map requirements to evidence. See [M2A setup/API](docs/M2A.md), [M2B.1 native-agent setup/demo](docs/M2B_1.md) and [current checkpoint](docs/STATUS.md). M2B.2 is implemented locally; see [comparison setup/demo](docs/M2B_2.md). The next unfinished task is M2B.3, which requires a new continuation. A roadmap entry does not mean the feature exists.
 
 ## Windows quick start (SQLite)
 

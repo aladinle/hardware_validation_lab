@@ -1,0 +1,5 @@
+agent/*.py text eol=lf
+contracts/*.py text eol=lf
+workloads/*.py text eol=lf
+*.hex text eol=lf
+*.jpg binary
