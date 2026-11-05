@@ -27,8 +27,8 @@ def matching_fixture_wheel(path):
         for package in ("contracts", "agent", "workloads"):
             for source in sorted((root / package).glob("*.py")):
                 archive.writestr(source.relative_to(root).as_posix(), source.read_bytes())
-        archive.writestr("hardware_validation_lab_contracts-0.3.0.dist-info/METADATA",
-                         "Metadata-Version: 2.4\r\nName: hardware-validation-lab-contracts\r\nVersion: 0.3.0\r\n")
+        archive.writestr("hardware_validation_lab_contracts-0.4.0.dist-info/METADATA",
+                         "Metadata-Version: 2.4\r\nName: hardware-validation-lab-contracts\r\nVersion: 0.4.0\r\n")
 
 
 class CANComparisonTests(unittest.TestCase):
