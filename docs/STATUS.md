@@ -2,7 +2,7 @@
 
 ## Outcome and approval boundary
 
-**M2B.3 standalone bounded runner is implemented locally and ready for review on `codex/m2b.3-bounded-local-runner`.** User approved merging the reviewed M2B.3 feature into main. Merge preparation started from unchanged main/origin main `74a67edf14cfb923d93aaed77b98a1d0c7437785`; final Git outcome will be recorded after verification. Preserve the reviewed implementation. Stop before M2B.4; approval to merge does not automatically authorize journal/dispatch work. The full M2B milestone is not complete.
+**M2B.3 standalone bounded runner was approved by the user and merged into main.** Feature commit `351af80` on codex/m2b.3-bounded-local-runner was pushed, merged without conflicts/force into main with merge commit `2677d36`, and main was pushed. Merge started from unchanged main/origin main `74a67ed`. Post-merge source verification still matches the reviewed wheel. This documentation follow-up records completion; final remote SHA verification is in the Git/chat handoff. Stop before M2B.4; approval to merge does not automatically authorize journal/dispatch work. The full M2B milestone is not complete.
 
 Scope: controlled prepare/execute/collect/owned cleanup; fixed installed CAN worker in a separate supervised process; validated resource policy, capped stdout/stderr, cooperative stop then escalation, observed process-tree termination, strict report/evidence checks and separate primary outcome/cleanup/evidence/uncertainty. Windows uses suspended launch and Job Objects; existing Ubuntu WSL uses process groups/per-process resource limits with explicitly weaker scopes. No SQL scheduler, Attempt/result ingestion, lease/quarantine allocator, durable journal, network dispatch, readiness or real hardware execution was added. Heartbeats remain idle.
 
@@ -38,7 +38,7 @@ Windows hard controls cover job-wide committed memory, aggregate user CPU time, 
 
 All observed native smoke trees were confirmed stopped. Normal acquired work files were cleaned. Intentionally read-only cleanup-failure evidence and early unknown host-temp entries remain under ignored .local; no secret files were staged or deleted. User webserver/PostgreSQL were left under their control; no new long-running service/worker was installed. Ubuntu was used through its existing WSL configuration, not terminated/reconfigured. Docker/hosted CI, macOS, Linux pip-install/service behavior, crash/restart journaling and real hardware remain unverified/out of scope.
 
-Five-minute demo, full manual test steps/expected exits, platform limits and three optional exercises are in [M2B_3.md](M2B_3.md). Next exact action: finish the explicitly approved M2B.3 commit/push/merge and verify remote main. M2B.4 requires its own continuation.
+Five-minute demo, full manual test steps/expected exits, platform limits and three optional exercises are in [M2B_3.md](M2B_3.md). Next exact action: review the merged checkpoint/demo if desired; implementation of M2B.4 awaits a new continuation. M2B.4 requires its own continuation.
 
 ---
 

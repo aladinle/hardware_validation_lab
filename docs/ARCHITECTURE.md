@@ -4,7 +4,7 @@ Scope follows the [unified roadmap](PLAN.md) and [requirements checklist](REQUIR
 
 ## Implemented in M2B.3
 
-`agent/runner.py` stages bounded local files, starts a fixed child behind containment/launch gates, drains capped output and validates/collects reports. Windows uses suspended launch plus Job Objects with hard job memory/CPU/process controls; Linux uses a session/group, worker resource limits and monitored group/disk budgets. Their scopes differ and are recorded in run.json. Cooperative cancellation precedes bounded escalation and observed stop confirmation. Cleanup is restricted to exact acquired file identities; uncertainty defers cleanup and sets a local quarantine-required flag. No SQL allocation/quarantine or journal is implemented. The local CLI is separate from network heartbeats; it cannot execute queued jobs. See [M2B_3.md](M2B_3.md). Main merge awaits explicit user approval.
+`agent/runner.py` stages bounded local files, starts a fixed child behind containment/launch gates, drains capped output and validates/collects reports. Windows uses suspended launch plus Job Objects with hard job memory/CPU/process controls; Linux uses a session/group, worker resource limits and monitored group/disk budgets. Their scopes differ and are recorded in run.json. Cooperative cancellation precedes bounded escalation and observed stop confirmation. Cleanup is restricted to exact acquired file identities; uncertainty defers cleanup and sets a local quarantine-required flag. No SQL allocation/quarantine or journal is implemented. The local CLI is separate from network heartbeats; it cannot execute queued jobs. See [M2B_3.md](M2B_3.md). User approved the M2B.3 merge into main; M2B.4 remains planned.
 
 ## Implemented in M2B.2
 

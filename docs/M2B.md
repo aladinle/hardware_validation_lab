@@ -19,7 +19,7 @@ Work sequentially so each task builds on a reviewed interface. Every task stops 
 
 A new request to continue starts the next unfinished task after the preceding review, currently **M2B.4 only**, unless the user explicitly identifies another already-unblocked task. M3 remains outside M2B. Do not enable ordinary dispatch of M2A jobs merely because an intermediate task compiles or passes unit tests. Use isolated synthetic fixtures for development; execution remains explicit, opt-in and fail-closed until its dependencies and safety checks work.
 
-Current checkpoint: M2B.3 is implemented on codex/m2b.3-bounded-local-runner. Its merge to main requires explicit user approval. Setup/tests are in [M2B_3.md](M2B_3.md). The next implementation task is M2B.4 only after review and a new continuation.
+Current checkpoint: M2B.3 was implemented on codex/m2b.3-bounded-local-runner and merged into main after explicit user approval. Setup/tests are in [M2B_3.md](M2B_3.md). The next implementation task is M2B.4 only after review and a new continuation.
 
 ## M2B.1 - agent identity and protocol
 
