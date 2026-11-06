@@ -1,5 +1,9 @@
 # Architecture
 
+## M2B.6 result/evidence boundary
+
+Assignment-bound ordered events, fixed-name bounded SQL bytea outputs and an immutable ExecutionResult extend the existing allocator. Upload metadata/bytes commit atomically; result commit verifies the complete sealed inventory and immutable context before ACK eligibility. Native journal accepts only the authenticated matching backend ACK and retains all files. Current-authorized JSON and attachment routes share job scope. Basic job detail shows separate outcome/cleanup/evidence. All leases remain held; complete portal/readiness/release/cancel and M3 recovery remain later gates. Older sections describe their historical milestones. See [M2B_6.md](M2B_6.md) and [STATUS.md](STATUS.md).
+
 ## Implemented in M2B.5
 
 Opt-in separate PostgreSQL allocator commits immutable Attempt plus global/agent/device/shared leases before native polling. Native agent downloads scoped bounded inputs and delegates to its durable journal/contained runner. The SQL control receipt records only a completion digest; local reports remain unacknowledged, leases held. Default is disabled; one global worker/assignment per agent. No physical readiness or backend outcome. Earlier milestone sections describe their historical scope. See [M2B_5.md](M2B_5.md) and [STATUS.md](STATUS.md).

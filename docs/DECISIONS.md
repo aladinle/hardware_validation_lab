@@ -1,5 +1,9 @@
 # Decisions
 
+## M2B.6 bounded SQL evidence storage
+
+Store a maximum of five fixed-name artifacts/18 MiB per Attempt in PostgreSQL bytea with their checksum instead of adding an untested object-store/SQL consistency boundary. SQL result and evidence acceptance commit before authenticated ACK; database triggers prevent update/delete of original outputs/events/outcomes. This is a bounded prototype choice, not a throughput/storage benchmark. Keep outcome/evaluation/cleanup/evidence separate, and conservatively hold leases until readiness/reconciliation exists. Package release 0.7.0 adds protocol behavior without changing the CAN 0.3.0 algorithm or identity heartbeat 0.2.0. No broker boundary/dependency was introduced. See [M2B_6.md](M2B_6.md) and [STATUS.md](STATUS.md).
+
 ## M2B.5 bounded assignment gate
 
 Keep the scheduler as an explicit foreground management command, enabled only with PostgreSQL and LAB_SIMULATOR_DISPATCH=1. Default-deny policy binds one simulated device/agent/approved package version/shared station. Persist assignment before delivery and retain all four leases after local completion; M2B.6 owns evidence ingestion/acknowledgement. A completion digest is not a backend test result. No broker/outbox boundary exists yet; introduce the outbox when one is added. No new dependency or service was installed. See [M2B_5.md](M2B_5.md) and [STATUS.md](STATUS.md).

@@ -189,7 +189,7 @@ class Job(models.Model):
     parameters = models.JSONField()
     snapshot = models.JSONField()
     queue_deadline = models.DateTimeField()
-    state = models.CharField(max_length=20, default="queued", choices=[(s,s.title()) for s in ("queued","reserved","running","quarantined","blocked","expired")])
+    state = models.CharField(max_length=20, default="queued", choices=[(s,s.title()) for s in ("queued","reserved","running","completed","quarantined","blocked","expired")])
     dispatch_reason = models.CharField(max_length=80, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -290,7 +290,7 @@ class Attempt(models.Model):
     job = models.ForeignKey(Job, on_delete=models.PROTECT, related_name='attempts')
     agent = models.ForeignKey(Agent, on_delete=models.PROTECT)
     epoch = models.PositiveBigIntegerField()
-    state = models.CharField(max_length=24, choices=[(s,s) for s in ('reserved','running','awaiting_evidence','quarantined')])
+    state = models.CharField(max_length=24, choices=[(s,s) for s in ('reserved','running','awaiting_evidence','completed','quarantined')])
     assignment = models.JSONField()
     claim_digest = models.CharField(max_length=64)
     deadline = models.DateTimeField()
@@ -314,3 +314,41 @@ class Lease(models.Model):
         constraints = [models.UniqueConstraint(fields=['resource'], condition=models.Q(released_at__isnull=True), name='one_active_lease_per_resource'),
                        models.UniqueConstraint(fields=['resource','attempt'], name='unique_attempt_resource'),
                        models.CheckConstraint(condition=models.Q(epoch__gte=1), name='lease_epoch_positive')]
+
+
+class ExecutionEvent(models.Model):
+    attempt = models.ForeignKey(Attempt, on_delete=models.PROTECT, related_name='events')
+    sequence = models.PositiveSmallIntegerField()
+    kind = models.CharField(max_length=32)
+    body_sha256 = models.CharField(max_length=64)
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['attempt','sequence'], name='unique_execution_event_sequence')]
+
+
+class OutputArtifact(models.Model):
+    """Bounded immutable evidence bytes in SQL, committed with their checksum."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    attempt = models.ForeignKey(Attempt, on_delete=models.PROTECT, related_name='outputs')
+    name = models.CharField(max_length=32)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveIntegerField()
+    content = models.BinaryField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['attempt','name'], name='unique_attempt_output_name')]
+
+
+class ExecutionResult(models.Model):
+    attempt = models.OneToOneField(Attempt, on_delete=models.PROTECT, related_name='execution_result')
+    completion_sha256 = models.CharField(max_length=64)
+    outcome = models.CharField(max_length=12)
+    evaluation_status = models.CharField(max_length=20)
+    cleanup_status = models.CharField(max_length=40)
+    evidence_status = models.CharField(max_length=20)
+    termination_confirmed = models.BooleanField()
+    quarantine_required = models.BooleanField()
+    report = models.JSONField()
+    received_at = models.DateTimeField(auto_now_add=True)

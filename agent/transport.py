@@ -34,6 +34,24 @@ class NoRedirects(HTTPRedirectHandler):
 
 
 class Transport:
+    def post_binary(self,path,data,credential,*,identity,name):
+        from contracts.evidence_v1 import OUTPUT_LIMITS, content_sha, output_name
+        from contracts.runner_v1 import strict_json
+        output_name(name)
+        if not path.startswith('/api/v1/agents/') or not path.endswith('/output') or any(c in path for c in ('?','#','..')) or not isinstance(data,bytes) or len(data)>OUTPUT_LIMITS[name]:
+            raise AgentError('Unsupported bounded evidence upload.')
+        request=Request(self.base_url+path,data=data,method='POST',headers={'Content-Type':'application/octet-stream',
+            'Authorization':'Bearer '+credential,'X-Execution-ID':identity['execution_id'],'X-Claim-Epoch':str(identity['epoch']),
+            'X-Claim-Token':identity['claim_token'],'X-Evidence-Name':name,'X-Content-SHA256':content_sha(data)})
+        try:
+            with self.opener.open(request,timeout=self.timeout) as response:
+                raw=response.read(MAX_MESSAGE_BYTES+1)
+                if len(raw)>MAX_MESSAGE_BYTES or response.headers.get_content_type()!='application/json':
+                    raise AgentError('Evidence reply exceeds protocol bounds.')
+                return strict_json(raw)
+        except (HTTPError,URLError,OSError,TimeoutError):
+            raise AgentError('Evidence upload failed; keep the original spool for retry.') from None
+
     def __init__(self, base_url, timeout=5):
         self.base_url = server_url(base_url)
         if type(timeout) is not int or not 1 <= timeout <= 30:

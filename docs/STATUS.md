@@ -1,4 +1,46 @@
-# Current M2B.5 checkpoint - 2026-11-05 (America/Los_Angeles)
+# Current M2B.6 checkpoint - 2026-11-06 (America/Los_Angeles)
+
+## Outcome and approval boundary
+
+**M2B.6 results/evidence is implemented locally for review on `codex/m2b.6-results-and-evidence`.** Initial checkout was clean main at b53dd3b902ac78b3faf0a3304da591c908892ff2 (same local origin/main). User committed e6eae41 and merged/pushed M2B.5 as b53dd3b. Earlier review guides saying .5 was uncommitted are historical. Created the new .6 branch without changing main. No .6 commit/push/merge or M2B.7 work. Existing user Agent ID label edit and other merged work preserved.
+
+Assignment-bound ordered events, bounded immutable SQL output bytes and final outcomes now bridge native journal to backend. Agent receives a verified completion ACK and durably records ACKNOWLEDGED; retained local/SQL evidence is not deleted. Identical replay handles partial uploads and lost final replies without a second worker. Minimal job detail shows stored outcome, independent cleanup/evidence and authorized downloads. Physical readiness remains NOT_EVALUATED, all four leases remain held, old .5 quarantine is untouched. Full simulator MVP is not complete.
+
+## Actual checks and evidence
+
+| Check | Actual result |
+| --- | --- |
+| Full `manage.py test lab -v 2`, real PostgreSQL, LAB_B2_REVIEW_WHEEL=actual 0.7.0 release | **170 tests passed in 46.795s, no skips**, `.local/b6-pg-final.txt`. Baseline 158 including .5 review regressions plus 12 new evidence/native-fixture/concurrency tests |
+| Upload/result/security checks | Complete immutable outcome, ordered event replay, missing output refusal, second-content/checksum/MIME/path/size/UTF-8 denial, current user/project/service/agent scope and revoked grants/tokens, stale claims/epochs/leases. Two actual PostgreSQL upload connections commit one artifact. Cleanup-failure fixture preserves PASS with cleanup ERROR and resource quarantine. PostgreSQL triggers reject deletion of original events/outputs/results; no SQLite concurrency claims |
+| Build/installation | Actual sdist/wheel 0.7.0 from `python -m build --no-isolation --sdist-extract-dir .local/build-b6-release --outdir .local/dist-b6-release`, `.local/b6-build.txt`; fresh `.local/b6-agent-venv` offline/no-deps install, no Django dependency. SHA-256 `db5059d688d6f47e5391e2471792848d108bb4c2488a08999a6a40438e44bd61`. CAN algorithm stays 0.3.0, identity heartbeat 0.2.0 |
+| Real HTTP/native PASS with lost final reply | Fresh hardware_lab_b6_pass_review, web 8771, actual package publication/CLI policy configuration/enrollment/input download. Fault helper abrupt exit 86 after SQL finalization but before local ACK. Local COMPLETE spool persisted; SQL result already present. New native process -> same execution ed7e1512-3fc6-4f08-bb9a-0d1a68fd0089, PASS/ACKNOWLEDGED, one spawn, two events, five artifacts, four held leases. `.local/b6-pass-verification.json` |
+| Real HTTP/native FAIL with partial-upload interruption | Fresh hardware_lab_b6_fail_review, web 8772, actual-missing.hex. Abrupt exit 87 after two uploads: SQL result absent, local COMPLETE spool and four leases retained. Restart -> same execution ec13978a-7a37-4e4e-afad-59ff7a7fdeab, original FAIL/ACKNOWLEDGED, one spawn/two events/five artifacts/four leases. `.local/b6-fail-verification.json`; this is a simulated missing-byte assertion failure, not hardware capture |
+| Authorized real HTTP reads/API restart | Session-authorized JSON and all five byte-for-byte downloads matched native retained files in both scopes. Restarted only the isolated PASS web process; completed-result polling after the original deadline, original output replay and downloads still succeeded without another spawn. No new finalization/release of stale work permitted |
+| Clean-installed Windows journal matrix | `tests/b4_package_smoke.py` using 0.7.0 clean native environment: eight groups passed, including six actual abrupt launch/seal/commit crashes. `.local/b6-windows-journal.txt`, evidence `.local/b4-installed-c0znkw0l/` |
+| Existing Ubuntu source regression | Same eight journal groups passed; `.local/b6-linux-journal.txt`, evidence `.local/b4-source-7gp3ao4r/`. Not Linux live HTTP, clean package/service deployment or power-cut evidence |
+| Schema/static/dependencies | Fresh isolated/test migrations 0007/0008, repeat migrate/no pending migrations and no model drift; Django check, Ruff, compileall and backend/native pip check passed. User live hardware_lab_m2a not migrated for .6 |
+| Desktop QA | Actual job template rendered as a labeled read-only isolated result snapshot. Browser screenshot/DOM verified Completed/PASS, separate evidence/cleanup and held-resource wording plus report links; no horizontal overflow at 1265/1265. HTTP auth/download behavior tested independently. No new browser login/mobile/physical-phone claim |
+| Documentation/hygiene | 17 Markdown files/93 resolving local links/73 unique requirement IDs/11 gate markers passed; 33 changed files passed whitespace/bounded credential scan, no tracked .local/.venv. Updated canonical roadmap/workflow/architecture/security/decisions/README, historical .5 note and new .6 guide. Documentation changes do not relabel old tests as rerun |
+
+The workspace PostgreSQL cluster initially refused connections; restarted that existing cluster with postgres-local.ps1, no installation or host security changes. An interrupted test setup was stopped before rerun. Early output tests exposed Django's test client omitting MIME headers for an empty binary body; fixed the fixture to send the same explicit application/octet-stream as the real client, keeping strict MIME validation. Initial service read fixture tried to submit human-owned inputs; corrected it to upload inputs under its own principal, preserving deny-by-default behavior. A template snapshot test used testserver outside the Django runner; changed that helper to localhost. Failed intermediate runs are not final evidence.
+
+## Changed files, storage and limits
+
+New contracts/evidence_v1.py; lab/evidence.py and evidence_api.py; ExecutionEvent/OutputArtifact/ExecutionResult models; migrations 0007/0008; test_evidence.py; guarded tests/b6_review.py and b6_fault_poll.py; [M2B_6.md](M2B_6.md). Updated native poller/transport/journal ACK, package/verifier/fixture metadata, agent endpoint binary handling, routes, job API/detail/template and allocator's already-finalized replay/deadline handling. Existing authoring/security behavior and old source/version/result snapshots preserved. No new dependencies, broker, privileged component or SQL-to-broker boundary.
+
+Output bytea is bounded to five fixed logical names/18 MiB per Attempt; original bytes/checksums and result commit in SQL, with no object-store dual-write claim. Artifact names never become server paths. Exact output inventory/assignment/input/package/runner/CAN report and human text agreement is verified before finalization. Report envelope records original IDs/snapshot/source, measured duration seconds, received timestamps and unknown hardware fields explicitly. Host owner/SQL administrator remain trusted; no remote attestation or durability under OS/storage power loss is proven.
+
+Current scheduler remains one worker/one assignment per agent/job. A finalized exact replay can recover an ACK after deadline only under current authority and unchanged fences; it cannot add evidence or modify outcome/ownership. Unfinished expired claims stay unavailable. Cleanup/evidence uncertainty preserves original outcome and quarantine. Evidence ACK means retained bytes were stored, not that physical readiness is known. No resource release endpoint; all leases remain held. Existing user .5 execution 08656d14-f297-4972-bf51-fe8c29152acf, local PASS and quarantine were not reset/backfilled. Fresh demo database/scope required; do not delete a journal or edit SQL leases to repeat.
+
+No Docker services/hosted CI/macOS/physical hardware/secure phone/large-scale blob throughput or complete M3 recovery evidence. Results dashboard/full responsive flow/cancellation/readiness remain .7/.8/later gates. Real PostgreSQL process and native HTTP evidence here do not establish physical termination/readiness guarantees.
+
+Both isolated review scopes were retired transactionally with audit: users disabled/session epochs advanced, agent keys/tickets revoked and resources quarantined. Original immutable outcomes/artifacts/events, native journals and four leases per scope remain. Removed only each helper's exact private metadata/enrollment/runtime-state files. Stopped owned review servers/preview on 8771/8772/8773; socket checks confirmed those closed, existing PostgreSQL 55439 reachable. The existing workspace cluster was left running; no other user server/WSL/security/service configuration changed. Final source/wheel verification still matched the recorded release digest. No live .6 migration, credential reset or change to the user's .5 reservation was performed.
+
+Five-minute demo, preparation/environment commands, expected outputs, interrupted-upload/ACK behavior and three optional exercises: [M2B_6.md](M2B_6.md). Next exact action: user reviews/tests .6, requests changes or explicitly approves merge. Stop before M2B.7. Earlier checkpoints below retain their original historical evidence.
+
+---
+
+# Historical M2B.5 checkpoint - 2026-11-05 (America/Los_Angeles)
 
 ## Outcome and approval boundary
 

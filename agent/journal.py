@@ -277,6 +277,20 @@ class Journal:
             connection.execute("UPDATE executions SET state='ACKNOWLEDGED',ack_source='local_demo' WHERE execution_id=?",(execution_id,))
         return self.status(execution_id)
 
+    def acknowledge_server(self, reply, origin):
+        from contracts.agents_v1 import schema
+        schema(reply,{'execution_id','epoch','completion_sha256','evidence_acknowledged','leases_released','hardware_ready'})
+        if reply['evidence_acknowledged'] is not True or reply['leases_released'] is not False or reply['hardware_ready'] is not False or type(reply['epoch']) is not int:
+            raise JournalError('Invalid backend evidence acknowledgement.')
+        row=self.row(identifier(reply['execution_id']))
+        _,value,_=self.read_completion(row['execution_id'])
+        with self.connect(write=True) as connection:
+            binding=connection.execute('SELECT origin FROM server_binding WHERE id=1').fetchone()
+            if not binding or binding['origin']!=origin or strict_json(row['packet'])['source']!='server_simulated_assignment' or row['state'] not in ('COMPLETE','ACKNOWLEDGED') or (reply['epoch'],reply['completion_sha256'])!=(row['epoch'],value):
+                raise JournalError('Backend ACK differs from accepted identity/completion.')
+            connection.execute("UPDATE executions SET state='ACKNOWLEDGED',ack_source='authenticated_backend' WHERE execution_id=?",(row['execution_id'],))
+        return self.status(row['execution_id'])
+
     def deliver(self, value, expected, actual, wheel, *, _checkpoint=None, _server=False):
         checkpoint = _checkpoint if _checkpoint is not None else lambda stage, info: None
         packet = parse_delivery(value,source='server_simulated_assignment' if _server else 'local_journal_demo')

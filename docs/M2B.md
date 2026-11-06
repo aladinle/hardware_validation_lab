@@ -1,6 +1,6 @@
 # M2B in eight reviewable tasks
 
-Decomposed 2026-11-05 at the user's request. The user subsequently authorized M2B.1; **M2B.1-.5 are now implemented locally**, with setup/evidence in [M2B_1.md](M2B_1.md). M2B.6-.8 remain planned; explicit opt-in synthetic dispatch exists, with no physical hardware execution or backend result ingestion. See [M2B_2.md](M2B_2.md). [PLAN.md](PLAN.md) remains canonical; this document decomposes the unchanged parent acceptance gate. Evidence is in [STATUS.md](STATUS.md).
+Decomposed 2026-11-05 at the user's request. The user subsequently authorized M2B.1; **M2B.1-.6 are now implemented locally**, with setup/evidence in [M2B_1.md](M2B_1.md). M2B.7-.8 remain planned; explicit opt-in synthetic dispatch exists, with stored results/evidence and no physical hardware execution. See [M2B_2.md](M2B_2.md). [PLAN.md](PLAN.md) remains canonical; this document decomposes the unchanged parent acceptance gate. Evidence is in [STATUS.md](STATUS.md).
 
 ## Work sequence
 
@@ -11,15 +11,15 @@ Decomposed 2026-11-05 at the user's request. The user subsequently authorized M2
 | M2B.3 (local, review) | Bounded local subprocess runner | Installed plugin runs within limits; timeout/cancel/malformed output and partial setup clean up correctly | .2 |
 | M2B.4 (local, review) | Durable local agent journal and spool | Restart/redelivery recognizes the same execution and cannot launch it twice | .3 |
 | M2B.5 (local, review) | Basic PostgreSQL assignment and agent polling | One authorized queued fixture becomes one durable exclusive assignment with epoch; revoked access/digest mismatch blocks dispatch | .1-.4 |
-| M2B.6 | Results and authorized evidence delivery | Versioned JSON/human reports persist; upload replay is safe, conflicts and unauthorized access fail | .5 |
+| M2B.6 (local, review) | Results and authorized evidence delivery | Versioned JSON/human reports persist; upload replay is safe, conflicts and unauthorized access fail | .5 |
 | M2B.7 | Simulator failures, cancellation and second plugins | Attach/detach/crash/disconnect/cancel/cleanup evidence is correct; readiness and file/network/communication simulation extend the registry | .3-.6 |
 | M2B.8 | Portal integration and final milestone review | Browser/HTTP -> native simulator agent -> SQL outcome -> authorized report; desktop/mobile states and complete failure matrix verified | .1-.7 |
 
 Work sequentially so each task builds on a reviewed interface. Every task stops with its own checkpoint/demo and optional learning questions. One task can take multiple two-hour sessions; eight tasks does **not** mean eight sessions. The earlier 18-26 engineering-hour figure is a planning estimate for the whole milestone, not a commitment or eight independently measured estimates. Re-estimate after inspecting each task and recording actual checks.
 
-A new request to continue starts the next unfinished task after the preceding review, currently **M2B.6 only**, unless the user explicitly identifies another already-unblocked task. M3 remains outside M2B. Do not enable ordinary dispatch of M2A jobs merely because an intermediate task compiles or passes unit tests. Use isolated synthetic fixtures for development; execution remains explicit, opt-in and fail-closed until its dependencies and safety checks work.
+A new request to continue starts the next unfinished task after the preceding review, currently **M2B.7 only**, unless the user explicitly identifies another already-unblocked task. M3 remains outside M2B. Do not enable ordinary dispatch of M2A jobs merely because an intermediate task compiles or passes unit tests. Use isolated synthetic fixtures for development; execution remains explicit, opt-in and fail-closed until its dependencies and safety checks work.
 
-Current checkpoint: M2B.4 merged; M2B.5 implemented on codex/m2b.5-postgres-assignment-polling. Setup/tests are in [M2B_5.md](M2B_5.md). Merge requires explicit approval; M2B.6 requires a new continuation. Leases remain held pending later evidence/reconciliation.
+Current checkpoint: M2B.5 merged; M2B.6 implemented on codex/m2b.6-results-and-evidence. Setup/tests are in [M2B_6.md](M2B_6.md). Merge requires explicit approval; M2B.7 requires a new continuation. Evidence ACK is implemented, but all leases remain held until safe readiness/reconciliation.
 
 ## M2B.1 - agent identity and protocol
 

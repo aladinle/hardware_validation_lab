@@ -39,7 +39,8 @@ def job_page(request, project_id, job_id):
     job = visible_jobs(Actor(user.pk), user, project, role, member).filter(pk=job_id).first()
     if job is None:
         raise Http404
-    return render(request, "job.html", {**ctx, "job": job, "now": timezone.now()})
+    from .evidence import result_data
+    return render(request, "job.html", {**ctx, "job": job, "result": result_data(job), "now": timezone.now()})
 
 
 @login_required

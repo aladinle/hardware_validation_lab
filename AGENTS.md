@@ -3,9 +3,9 @@
 Read this file and docs/STATUS.md before continuation; then docs/PLAN.md and relevant implementation.
 
 - Canonical roadmap: docs/PLAN.md, reconciled 2026-11-03; docs/REQUIREMENTS.md is its coverage/evidence checklist. Original/PDF milestone numbers are historical; use PLAN's crosswalk.
-- Active scope: M2B.5 opt-in PostgreSQL synthetic assignment/polling implemented locally on codex/m2b.5-postgres-assignment-polling, at review. Read docs/M2B_5.md and STATUS. Stop before M2B.6. Completion receipts do not acknowledge evidence or release leases; no physical execution is enabled.
-- M2B has eight tasks in docs/M2B.md. .1-.5 are locally implemented with recorded limits; .6-.8 are planned. New continuation starts .6 only after review, not the remaining milestone.
-- Preserve work; inspect Git status first. M2B.4 was explicitly approved, committed/merged/pushed; main/origin main baseline aaad8d8. M2B.5 remains uncommitted/unmerged; further commits/pushes/merges require approval. No automatic publication/external accounts/spending/host security changes.
+- Active scope: M2B.6 assignment-bound events, SQL results/evidence and authenticated acknowledgement implemented on codex/m2b.6-results-and-evidence, at review. Read docs/M2B_6.md and STATUS. Stop before M2B.7. Evidence acknowledgement never releases leases; no physical readiness/execution is enabled.
+- M2B has eight tasks in docs/M2B.md. .1-.6 are locally implemented with recorded limits; .7-.8 are planned. New continuation starts .7 only after review, not the remaining milestone.
+- Preserve work; inspect Git status first. User committed/pushed/merged M2B.5; clean main baseline b53dd3b was verified before creating the M2B.6 branch. No automatic commits/pushes/merges/publication/external accounts/spending/host security changes. M2B.6 merge requires explicit approval.
 - No additional agents unless the user requests them. GitHub origin: https://github.com/aladinle/hardware_validation_lab.git. Use verified TLS; per-command Windows schannel works without changing host trust settings.
 - Django server templates and minimal JavaScript; SQLite is quick-start only. PostgreSQL is integration authority. Never claim PostgreSQL scheduling correctness from SQLite tests.
 - Keep Django ORM/migrations/auth; do not migrate to FastAPI/SQLAlchemy/Alembic to match the PDF. Add typed v1 API/contracts and native agent packages incrementally. PDF execution_id maps to Attempt ID; use PLAN's canonical lifecycle/outcome/evaluation mapping.

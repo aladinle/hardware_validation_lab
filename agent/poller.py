@@ -1,4 +1,4 @@
-"""Explicit simulator polling client. No output upload/ACK or resource release."""
+"""Explicit synthetic polling/evidence client; no physical readiness or lease release."""
 import argparse
 import hashlib
 import os
@@ -9,6 +9,7 @@ from contracts.agents_v1 import schema
 from contracts.dispatch_v1 import poll_reply
 from contracts.journal_v1 import canonical
 from contracts.v1 import ContractError
+from contracts.evidence_v1 import OUTPUT_LIMITS, content_sha, validate_completion
 from workloads.registry import verify_wheel
 from .client import load_state
 from .journal import Journal, JournalError, durable_write, initialize
@@ -45,7 +46,7 @@ def poll_once(state_file,journal_root,wheel):
     identity={'schema_version':1,'execution_id':packet['execution_id'],'epoch':packet['epoch'],'claim_token':claim}
     accepted=transport.post(route+'/claim',identity,credential['token'])
     schema(accepted,{'execution_id','epoch','state'})
-    if (accepted['execution_id'],accepted['epoch'])!=(packet['execution_id'],packet['epoch']) or accepted['state'] not in ('running','awaiting_evidence'):
+    if (accepted['execution_id'],accepted['epoch'])!=(packet['execution_id'],packet['epoch']) or accepted['state'] not in ('running','awaiting_evidence','completed','quarantined'):
         raise AgentError('Claim reply violates assignment identity.')
     with journal.connect() as connection:
         existing=connection.execute('SELECT 1 FROM executions WHERE execution_id=?',(packet['execution_id'],)).fetchone()
@@ -67,25 +68,44 @@ def poll_once(state_file,journal_root,wheel):
     # Recheck current authority/fence immediately before the local launch path.
     checked=transport.post(route+'/claim',identity,credential['token'])
     schema(checked,{'execution_id','epoch','state'})
-    if (checked['execution_id'],checked['epoch'])!=(packet['execution_id'],packet['epoch']) or checked['state'] not in ('running','awaiting_evidence'):
+    if (checked['execution_id'],checked['epoch'])!=(packet['execution_id'],packet['epoch']) or checked['state'] not in ('running','awaiting_evidence','completed','quarantined'):
         raise AgentError('Final claim identity changed before journal handoff.')
+    def send_event(sequence,kind):
+        reply=transport.post(route+'/events',{**identity,'sequence':sequence,'kind':kind},credential['token'])
+        schema(reply,{'execution_id','epoch','sequence','recorded'})
+        if (reply['execution_id'],reply['epoch'],reply['sequence'],reply['recorded'])!=(packet['execution_id'],packet['epoch'],sequence,True):
+            raise AgentError('Event reply identity conflict.')
+    send_event(1,'execution_accepted')
     result=journal.deliver(packet,incoming/'expected.hex',incoming/'actual.hex',wheel,_server=True)
     receipt_recorded=False
+    evidence_acknowledged=False
     if result['state'] in ('COMPLETE','ACKNOWLEDGED'):
         receipt=transport.post(route+'/receipt',{**identity,'completion_sha256':result['completion_hash']},credential['token'])
         schema(receipt,{'execution_id','epoch','state','evidence_acknowledged','leases_released'})
         if (receipt['execution_id'],receipt['epoch'])!=(packet['execution_id'],packet['epoch']) or receipt['state']!='awaiting_evidence' or receipt['evidence_acknowledged'] is not False or receipt['leases_released'] is not False:
             raise AgentError('Unexpected evidence/release acknowledgement.')
         receipt_recorded=True
-    # Retain the owned incoming cache too in this single-assignment gate; no
-    # arbitrary recursive cleanup or automatic evidence ACK is performed.
+        send_event(2,'local_completion_sealed')
+        seal,value,_=journal.read_completion(packet['execution_id'])
+        validate_completion(seal,packet)
+        for name in sorted(set(seal['files'])&set(OUTPUT_LIMITS)):
+            raw=bounded_read(journal.spool/packet['execution_id']/name,OUTPUT_LIMITS[name])
+            reply=transport.post_binary(route+'/output',raw,credential['token'],identity=identity,name=name)
+            schema(reply,{'execution_id','epoch','name','sha256','size','stored'})
+            if (reply['execution_id'],reply['epoch'],reply['name'],reply['sha256'],reply['size'],reply['stored'])!=(packet['execution_id'],packet['epoch'],name,content_sha(raw),len(raw),True):
+                raise AgentError('Evidence storage reply conflict.')
+        reply=transport.post(route+'/result',{**identity,'completion':seal,'completion_sha256':value},credential['token'])
+        if reply.get('execution_id')!=packet['execution_id']:raise AgentError('Result reply identity conflict.')
+        result={**result,**journal.acknowledge_server(reply,origin)}
+        evidence_acknowledged=True
+    # All spool files and incoming inputs remain retained after ACK.
     return {'assignment_received':True,'execution_id':packet['execution_id'],'epoch':packet['epoch'],'journal_state':result['state'],
             'newly_accepted':result['newly_accepted'],'local_outcome':result['result']['outcome'] if result['result'] else None,
-            'receipt_recorded':receipt_recorded,'evidence_acknowledged':False,'leases_released':False,'hardware_ready':False}
+            'receipt_recorded':receipt_recorded,'evidence_acknowledged':evidence_acknowledged,'leases_released':False,'hardware_ready':False}
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description='Explicit outbound synthetic polling; no hardware or output upload.')
+    parser=argparse.ArgumentParser(description='Explicit outbound synthetic polling and evidence; no physical hardware.')
     parser.add_argument('--state-file',required=True)
     parser.add_argument('--journal-root',required=True)
     parser.add_argument('--wheel',required=True)

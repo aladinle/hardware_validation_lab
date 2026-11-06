@@ -121,7 +121,7 @@ def schedule_once():
     global_resource=resource('global','single_worker')
     global_resource=Resource.objects.select_for_update().get(pk=global_resource.pk)
     # Expiration quarantines in place. No process/hardware stop is inferred.
-    for attempt in Attempt.objects.filter(Q(deadline__lte=timezone.now())|Q(leases__expires_at__lte=timezone.now(),leases__released_at__isnull=True)).exclude(state='quarantined').distinct():
+    for attempt in Attempt.objects.filter(Q(deadline__lte=timezone.now())|Q(leases__expires_at__lte=timezone.now(),leases__released_at__isnull=True)).filter(execution_result__isnull=True).exclude(state='quarantined').distinct():
         User.objects.select_for_update().get(pk=attempt.job.batch.requester_id)
         Project.objects.select_for_update().get(pk=attempt.job.batch.project_id)
         Agent.objects.select_for_update().get(pk=attempt.agent_id)
@@ -179,18 +179,19 @@ def schedule_once():
     return None
 
 
-def guard(agent,execution_id,epoch,claim):
+def guard(agent,execution_id,epoch,claim,*,allow_finalized=False):
     attempt=Attempt.objects.select_for_update().filter(pk=identifier(execution_id),agent=agent).first()
     if attempt is None or type(epoch) is not int or epoch!=attempt.epoch or not isinstance(claim,str) or not hmac.compare_digest(digest(claim),attempt.claim_digest):
         raise Rejected('STALE_CLAIM','Assignment identity/epoch/token mismatch.',409)
-    if attempt.state=='quarantined' or attempt.deadline<=timezone.now():
+    finalized=allow_finalized and hasattr(attempt,'execution_result')
+    if not finalized and (attempt.state=='quarantined' or attempt.deadline<=timezone.now()):
         raise Rejected('ALLOCATION_UNAVAILABLE','Allocation expired or quarantined; ownership remains held.',409)
     authority(attempt.job)
     agent_ready(agent,fresh=False)
     if agent.execution_package_sha256!=attempt.assignment['manifest']['plugin_package_sha256']:
         raise Rejected('PACKAGE_MISMATCH','Package changed; allocation remains held.',409)
     leases=list(attempt.leases.filter(released_at=None).select_related('resource'))
-    if len(leases)<4 or any(l.epoch!=epoch or l.resource.fencing_epoch!=epoch or l.resource.quarantined or l.expires_at<=timezone.now() for l in leases):
+    if len(leases)<4 or any(l.epoch!=epoch or l.resource.fencing_epoch!=epoch or (not finalized and (l.resource.quarantined or l.expires_at<=timezone.now())) for l in leases):
         raise Rejected('STALE_FENCE','Resource fencing mismatch; ownership remains held.',409)
     if not AgentDevice.objects.filter(agent=agent,device=attempt.job.device,active=True).exists():
         raise Rejected('AGENT_SCOPE_REVOKED','Agent device binding changed.',403)
@@ -211,14 +212,14 @@ def poll(agent_id,raw,payload):
     if attempt is None:
         return {'schema_version':1,'assignment':None,'claim_token':None,'hardware_ready':False}
     claim=token_for(attempt)
-    guard(agent,str(attempt.pk),attempt.epoch,claim)
+    guard(agent,str(attempt.pk),attempt.epoch,claim,allow_finalized=True)
     return {'schema_version':1,'assignment':attempt.assignment,'claim_token':claim,'hardware_ready':False}
 
 
 def claim(agent_id,raw,payload):
     enabled();schema(payload,{'execution_id','epoch','claim_token'})
     agent,_=receiver(agent_id,raw)
-    attempt=guard(agent,payload['execution_id'],payload['epoch'],payload['claim_token'])
+    attempt=guard(agent,payload['execution_id'],payload['epoch'],payload['claim_token'],allow_finalized=True)
     if attempt.state=='reserved':
         attempt.state='running';attempt.save(update_fields=['state'])
         Job.objects.filter(pk=attempt.job_id).update(state='running')
@@ -241,8 +242,11 @@ def input_bytes(agent_id,raw,payload):
 def receipt(agent_id,raw,payload):
     enabled();schema(payload,{'execution_id','epoch','claim_token','completion_sha256'})
     agent,_=receiver(agent_id,raw)
-    attempt=guard(agent,payload['execution_id'],payload['epoch'],payload['claim_token'])
+    attempt=guard(agent,payload['execution_id'],payload['epoch'],payload['claim_token'],allow_finalized=True)
     value=sha(payload['completion_sha256'])
+    if hasattr(attempt,'execution_result'):
+        if attempt.receipt_sha256!=value:raise Rejected('RECEIPT_CONFLICT','Receipt conflicts with stored result.',409)
+        return {'schema_version':1,'execution_id':str(attempt.pk),'epoch':attempt.epoch,'state':'awaiting_evidence','evidence_acknowledged':False,'leases_released':False}
     if attempt.state not in ('running','awaiting_evidence') or (attempt.receipt_sha256 and attempt.receipt_sha256!=value):
         raise Rejected('RECEIPT_CONFLICT','Receipt conflicts with current claim.',409)
     if not attempt.receipt_sha256:

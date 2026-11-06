@@ -37,7 +37,7 @@ def administrator_detail(request, actor, project_id, agent_id):
     return JsonResponse(manage_agent(actor, project_id, agent_id, payload["action"], payload.get("device_ids")))
 
 
-def agent_endpoint(scheme, function):
+def agent_endpoint(scheme, function, *, binary=False):
     @csrf_exempt
     @wraps(function)
     def endpoint(request, agent_id):
@@ -51,7 +51,7 @@ def agent_endpoint(scheme, function):
                 return response
             # Authentication and mutation commit/rollback together; endpoints never accept cookies.
             with transaction.atomic():
-                payload = body(request)
+                payload = request if binary else body(request)
                 response = function(agent_id, authorization[len(scheme) + 1:], payload)
                 return response if isinstance(response,HttpResponse) else JsonResponse(response)
         except Rejected as exc:

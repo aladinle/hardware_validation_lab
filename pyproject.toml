@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hardware-validation-lab-contracts"
-version = "0.6.0"
+version = "0.7.0"
 description = "Typed contracts, native idle agent, synthetic CAN comparator and bounded local runner"
 requires-python = ">=3.11"
 

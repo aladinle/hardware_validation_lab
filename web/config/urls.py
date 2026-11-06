@@ -1,4 +1,5 @@
 from django.urls import path
+from lab import evidence, evidence_api
 from django.views.generic import TemplateView
 from lab import views
 from lab import api
@@ -16,6 +17,11 @@ urlpatterns = [
     path("api/v1/agents/<uuid:agent_id>/claim", agent_api.agent_endpoint('Bearer',dispatch.claim)),
     path("api/v1/agents/<uuid:agent_id>/input", agent_api.agent_endpoint('Bearer',dispatch.input_bytes)),
     path("api/v1/agents/<uuid:agent_id>/receipt", agent_api.agent_endpoint('Bearer',dispatch.receipt)),
+    path("api/v1/agents/<uuid:agent_id>/events", agent_api.agent_endpoint('Bearer',evidence.event)),
+    path("api/v1/agents/<uuid:agent_id>/output", agent_api.agent_endpoint('Bearer',evidence.upload_output,binary=True)),
+    path("api/v1/agents/<uuid:agent_id>/result", agent_api.agent_endpoint('Bearer',evidence.finalize)),
+    path("api/v1/jobs/<uuid:job_id>/result", evidence_api.result),
+    path("api/v1/outputs/<uuid:output_id>", evidence_api.output),
     path("health/", api.health),
     path("ready/", api.ready),
     path("api/v1/catalog", api.catalog),

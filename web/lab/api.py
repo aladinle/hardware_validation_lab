@@ -97,8 +97,11 @@ def version_data(version):
 
 
 def job_data(job):
+    from .evidence import result_data
+    result=result_data(job)
     return {"schema_version": 1, "id": str(job.pk), "run_id": str(job.run.pk), "batch_id": str(job.batch_id),
-            "state": job.state, "outcome": None, "execution_available": False,
+            "state": job.state, "outcome": result['runner']['outcome'] if result else None, "execution_available": False,
+            "evidence_status": result['runner']['evidence_status'] if result else 'PENDING',
             "queue_deadline": job.queue_deadline.isoformat(), "queue_deadline_elapsed": job.queue_deadline <= timezone.now(),
             "created_at": job.created_at.isoformat(), "snapshot": job.snapshot}
 
