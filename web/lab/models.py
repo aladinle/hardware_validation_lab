@@ -189,7 +189,8 @@ class Job(models.Model):
     parameters = models.JSONField()
     snapshot = models.JSONField()
     queue_deadline = models.DateTimeField()
-    state = models.CharField(max_length=16, default="queued", choices=[("queued", "Queued")])
+    state = models.CharField(max_length=20, default="queued", choices=[(s,s.title()) for s in ("queued","reserved","running","quarantined","blocked","expired")])
+    dispatch_reason = models.CharField(max_length=80, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -208,6 +209,10 @@ class Agent(models.Model):
     name = models.CharField(max_length=80)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
+    execution_enabled = models.BooleanField(default=False)
+    execution_package_sha256 = models.CharField(max_length=64, blank=True)
+    execution_contact_at = models.DateTimeField(null=True)
+    execution_platform = models.CharField(max_length=12, blank=True)
     enabled = models.BooleanField(default=True)
     enrolled_at = models.DateTimeField(null=True)
     last_contact_at = models.DateTimeField(null=True)
@@ -256,3 +261,56 @@ class AgentHeartbeat(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=["agent", "heartbeat_id"], name="unique_agent_heartbeat")]
         indexes = [models.Index(fields=["agent", "received_at"], name="agent_contact_idx")]
+
+
+class Resource(models.Model):
+    """SQL allocation state, never physical hardware readiness."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    project = models.ForeignKey(Project, on_delete=models.PROTECT, null=True)
+    kind = models.CharField(max_length=12, choices=[(s,s) for s in ('global','agent','device','shared')])
+    key = models.CharField(max_length=100)
+    quarantined = models.BooleanField(default=False)
+    fencing_epoch = models.PositiveBigIntegerField(default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['project','kind','key'], name='unique_project_resource'),
+                       models.UniqueConstraint(fields=['kind','key'], condition=models.Q(project__isnull=True), name='unique_global_resource')]
+
+
+class DispatchPolicy(models.Model):
+    device = models.OneToOneField(Device, on_delete=models.PROTECT, related_name='dispatch_policy')
+    agent = models.ForeignKey(Agent, on_delete=models.PROTECT)
+    version = models.ForeignKey(TestVersion, on_delete=models.PROTECT)
+    enabled = models.BooleanField(default=False)
+    shared_resources = models.ManyToManyField(Resource)
+
+
+class Attempt(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job = models.ForeignKey(Job, on_delete=models.PROTECT, related_name='attempts')
+    agent = models.ForeignKey(Agent, on_delete=models.PROTECT)
+    epoch = models.PositiveBigIntegerField()
+    state = models.CharField(max_length=24, choices=[(s,s) for s in ('reserved','running','awaiting_evidence','quarantined')])
+    assignment = models.JSONField()
+    claim_digest = models.CharField(max_length=64)
+    deadline = models.DateTimeField()
+    receipt_sha256 = models.CharField(max_length=64, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['job'], name='one_m2b5_attempt_per_job'),
+                       models.UniqueConstraint(fields=['agent'], name='one_m2b5_attempt_per_agent'),
+                       models.CheckConstraint(condition=models.Q(epoch__gte=1), name='attempt_epoch_positive')]
+
+
+class Lease(models.Model):
+    resource = models.ForeignKey(Resource, on_delete=models.PROTECT)
+    attempt = models.ForeignKey(Attempt, on_delete=models.PROTECT, related_name='leases')
+    epoch = models.PositiveBigIntegerField()
+    expires_at = models.DateTimeField()
+    released_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['resource'], condition=models.Q(released_at__isnull=True), name='one_active_lease_per_resource'),
+                       models.UniqueConstraint(fields=['resource','attempt'], name='unique_attempt_resource'),
+                       models.CheckConstraint(condition=models.Q(epoch__gte=1), name='lease_epoch_positive')]

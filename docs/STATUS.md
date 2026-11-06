@@ -1,4 +1,55 @@
-# Current M2B.4 checkpoint - 2026-11-05 (America/Los_Angeles)
+# Current M2B.5 checkpoint - 2026-11-05 (America/Los_Angeles)
+
+## Outcome and approval boundary
+
+**M2B.4 was approved, merged and pushed. M2B.5 is implemented locally for review, uncommitted/unmerged on `codex/m2b.5-postgres-assignment-polling`.** M2B.4 feature b847781, merge feea7de and documentation aaad8d8 are on main; local main and origin/main both resolve to aaad8d805469ec055f0bf68eb1c961d9850f766c. No conflicts/force pushes or persistent TLS changes. Per-command Windows schannel verified GitHub TLS. M2B.5 has not been committed, pushed or merged. Stop before M2B.6.
+
+Explicit default-off PostgreSQL synthetic policy now connects queued approved package-bound jobs to one durable Attempt and four exclusive leases before outbound authenticated polling. Native polling downloads authorized bounded inputs, verifies checksums and uses the existing contained runner/journal. Redelivery retains the same ID/epoch and cannot rerun it. Only a local completion digest/control receipt is stored in SQL: awaiting_evidence. Actual report/outcome remains local; evidence is unacknowledged and leases remain held. No physical execution/readiness or backend PASS/FAIL result is claimed.
+
+## Actual checks and evidence
+
+### Review fix: simulator configuration command option
+
+User CLI testing exposed `argparse.ArgumentError`: configure_simulator_dispatch reused Django's built-in --version flag for the test-version UUID. Renamed the custom flag and handler key to --test-version/test_version; updated M2B_5.md. Python/Django library files were not changed. Prior native HTTP proof configured policy through the guarded helper/service, so it did not cover this management-command parser; the earlier gate evidence must not be interpreted as that CLI having passed.
+
+Added an actual `call_command` regression with CLI-style options, verifying the intended policy/version/shared station and no Attempt created. `configure_simulator_dispatch --help` now succeeds (`.local/b5-configure-help.txt`). `manage.py test lab.test_dispatch -v 1` on a separate real PostgreSQL test database passed **14 tests in 3.387s**, `.local/b5-command-fix-tests.txt`; no skips. No live policy/agent mutation or full-suite rerun for this fix. Changed command, test_dispatch.py, M2B_5.md and STATUS.md; native wheel source is unaffected. Next exact action: rerun the configuration command using --test-version, then resume the documented demo. Existing three optional exercises and remaining limits apply; M2B.5 is still uncommitted/unmerged.
+
+### Review fix: independent authoring forms
+
+User reported successful Approve also displayed required Name/Header bytes errors in Save a draft. Root cause: workbench bound DraftForm to every POST; rendering form.as_p validated missing draft fields even for approval/publication/grant actions. Changed portal_jobs.py to bind the draft form only for action=save. Validation, CSRF, authorization and audited approval services remain in place. No live approval/account/data mutation was performed for this fix.
+
+Regression in test_m2a.py first reproduced failures for approve/revoke/grant/ungrant/publish (`.local/b5-workbench-before.txt`); after the fix, `manage.py test lab.test_m2a.M2ATests -v 1` against a separate PostgreSQL test database passed **27 tests in 1.660s**, `.local/b5-workbench-after.txt`. It verifies successful non-draft actions without draft errors and missing draft fields rejected on Save. The earlier full 156-test result below is historical; the full suite was not rerun for this scoped fix. Changed files: portal_jobs.py, test_m2a.py, STATUS.md and M2B_5.md. No new browser QA claimed. Restart the no-reload web process, reload the workbench, verify Approve with an empty draft has no field errors, then Save an empty draft and verify required fields. M2B.5 remains uncommitted/unmerged; review gate unchanged.
+
+| Check | Actual result |
+| --- | --- |
+| `scripts/postgres-local.ps1 -Action test`, LAB_B2_REVIEW_WHEEL = final actual 0.6.0 wheel | **156 tests passed in 65.398s, no skips**; `.local/b5-pg-final.txt`. Includes baseline 143 plus 11 PostgreSQL allocation/security tests and two binary transport tests |
+| PostgreSQL authority | Two real competing allocator connections -> one Attempt; shared station conflict -> no partial allocation; revoked grants/approval/account/membership/service token, stale contact, queue expiry, metadata/package mismatch, cookie/CI/wrong-agent denial, stale claim/epoch/fence and immutable assignment trigger covered. Lease expiry quarantines without release. Not full M3 parallel scheduling/recovery evidence |
+| Actual release build | `python -m build --no-isolation --sdist-extract-dir .local/build-b5-final --outdir .local/dist-b5-final`; actual sdist/wheel 0.6.0 built, `.local/b5-build-final.txt`. SHA-256 `c580246aab5426dec42f2dbd11174f972f4e2b63ae81909deb425c5cb32924ab`; CAN algorithm remains 0.3.0 |
+| Clean native installation | Fresh `.local/b5-agent-venv`, offline/no-deps wheel install/reinstall, actual module poller and contained native child |
+| Real HTTP + native agent | Isolated PostgreSQL `hardware_lab_b5_final_review`, web port 8769, real package publication and input storage. Idle poll -> separate committed assignment -> claim/input download/native comparison -> repeated receipt/poll with one spawn. Attempt `13389e46-fcd1-41c9-ab98-5a11bad7396e`, epoch 1; local COMPLETE/PASS; SQL awaiting_evidence; four held leases; legacy metadata job still queued/no Attempt. Nonsecret evidence `.local/b5-final-live-verification.json` |
+| Revocation and acknowledgement boundary | Explicit requester device-grant revocation -> real poller exit 2. Existing authenticated machine heartbeat still 200, hardware readiness false. Fake local-demo ACK of server assignment rejected; SQL evidence acknowledgement/release never asserted |
+| Installed Windows journal/crash regression | `tests/b4_package_smoke.py` using clean 0.6.0 interpreter/wheel: all eight groups passed, including six actual abrupt crash checkpoints. `.local/b5-journal-regression.txt`, evidence `.local/b4-installed-cq_gda1c/` |
+| Existing Ubuntu source-mode journal regression | Same eight groups passed, `.local/b5-linux-regression.txt`, evidence `.local/b4-source-_bawfj5e/`. Not Linux live HTTP or a clean Linux service/package deployment |
+| Configuration/schema checks | Ruff, compileall, backend and clean native pip check passed. Django check passed; migration drift check found none; isolated review database migration check and repeat migrate passed. Fresh test databases applied migrations 0005/0006. User live hardware_lab_m2a was not upgraded |
+| Docker | Compose simulator profile configuration parsed with nonsecret dummy environment. Docker engine unavailable (missing engine pipe), so no container integration run |
+| Desktop review | Real agent template rendered as clearly labeled inactive-form isolated snapshot; actual browser screenshot reviewed, no horizontal overflow (1265/1265). Verified Physical execution: Disabled wording. No new interactive browser login/mobile/physical phone QA claimed |
+| Documentation/hygiene | 16 Markdown files, 81 resolving local links, 73 unique requirement IDs and 11 gate markers; whitespace and bounded secret/runtime-file checks. Documentation-only edits do not count as new application tests |
+
+An early full run exposed an old test expecting the now-implemented claim route to return 404; it now asserts disabled dispatch returns 409 while unimplemented routes remain 404. Fixture setup/token-order issues were corrected before the final run. A cold console enrollment consumed a ticket without persisting its state; exact cause unproven. Explicit administrator reissue revoked the lost runtime key; fresh module-entry enrollment succeeded. Failed intermediate attempts are not pass evidence. No TLS, browser or monitoring security was disabled.
+
+## Changed files and limits
+
+New dispatch_v1 contract, agent/poller.py, lab/dispatch.py, configure_simulator_dispatch/scheduler commands, PostgreSQL migrations 0005/0006, dispatch tests, guarded isolated review helper and [M2B_5.md](M2B_5.md). Updated Job/Agent and Attempt/Resource/Lease/DispatchPolicy models, submission authority snapshots, agent endpoints/transport/journal origin and ACK boundaries, route/settings/policy invalidation, package/verifier/test metadata, Docker/config/templates and workflow/roadmap/security/architecture/decision/requirements/README/status documents. No new dependencies or privileged components.
+
+One global worker and one assignment per agent/job are intentional bounds. All leases stay held after local completion. Fixed 90-second lease, no automatic renewal/release; 30-second authenticated execution-poll freshness only for new allocation. Expiry/revocation never establishes stopped hardware. No broker/outbox boundary yet. Claim HMAC is bound to server secret/execution/receiver/epoch; rotating server secret requires outstanding allocation reconciliation. Package self-report is not hostile-host attestation. Local journal/storage assumptions and power-loss limits from .4 remain.
+
+Retired both isolated review scopes: account disabled, keys/tickets revoked, allocation/resources quarantined, held leases and evidence preserved. Final retirement is transactional and audited. Removed only those helpers' exact private metadata/enrollment/state files. Stopped owned web/snapshot processes on 8768/8769/8770; socket checks confirmed all three closed and PostgreSQL 55439 reachable. Existing user PostgreSQL and web processes were not stopped. No results, old versions, journals or user credentials deleted. Real hardware, macOS, hosted CI, Docker services, backend result/evidence ingestion and full M3 recovery remain unverified or future work.
+
+Five-minute demo, preparation, expected outputs/exit codes, limits and three optional review exercises: [M2B_5.md](M2B_5.md). Next exact action: user reviews/tests and approves M2B.5 merge or requests changes. A new continuation is required for M2B.6. Earlier checkpoint sections below are historical evidence, not current authorization or rerun claims.
+
+---
+
+# Historical M2B.4 checkpoint - 2026-11-05 (America/Los_Angeles)
 
 ## Outcome and approval boundary
 

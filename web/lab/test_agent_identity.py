@@ -168,7 +168,10 @@ class AgentIdentityTests(TestCase):
         inventory = self.client.get(f"/api/v1/catalog?project_id={self.project.pk}").json()["devices"]
         self.assertTrue(all(not device["online"] and not device["ready"] for device in inventory))
         self.assertEqual(Device.objects.get(pk=self.device.pk).capabilities, self.device.capabilities)
-        for suffix in ("claim", "result", "events", "cancel"):
+        # M2B.5 adds an explicitly disabled-by-default claim route. Heartbeat
+        # itself still never assigns work or attests readiness.
+        self.assertEqual(self.post(f"/api/v1/agents/{agent.pk}/claim", {}, credential["token"]).status_code,409)
+        for suffix in ("result", "events", "cancel"):
             self.assertEqual(self.post(f"/api/v1/agents/{agent.pk}/{suffix}", {}, credential["token"]).status_code, 404)
 
     def test_duplicate_heartbeat_does_not_refresh_contact_and_conflict_is_409(self):

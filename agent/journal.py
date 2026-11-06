@@ -137,12 +137,12 @@ class Journal:
     def status(self, execution_id):
         row = self.row(execution_id)
         return {key:row[key] for key in ('execution_id','epoch','state','request_hash','launch_intents','spawn_records','completion_hash','ack_source','reason')} | {
-            'source':'local_journal_demo', 'result':strict_json(row['result']) if row['result'] else None,
+            'source':strict_json(row['packet'])['source'], 'result':strict_json(row['result']) if row['result'] else None,
             'worker':strict_json(row['worker']) if row['worker'] else None,
             'spool_retained':(self.spool/row['execution_id']).is_dir(), 'dispatch_available':False}
 
-    def accept(self, packet):
-        packet = parse_delivery(packet)
+    def accept(self, packet, *, _server=False):
+        packet = parse_delivery(packet,source='server_simulated_assignment' if _server else 'local_journal_demo')
         if packet['agent_id'] != self.meta['agent_id'] or packet['project_id'] != self.meta['project_id']:
             raise JournalError('Delivery is outside this journal identity.')
         request_hash = checksum(packet)
@@ -267,6 +267,8 @@ class Journal:
         """Trusted local demonstration only; no backend upload is claimed."""
         execution_id = identifier(execution_id)
         row = self.row(execution_id)
+        if strict_json(row['packet'])['source']!='local_journal_demo':
+            raise JournalError('Server assignments require a verified backend evidence acknowledgement, not a demo ACK.')
         _, digest, _ = self.read_completion(execution_id)
         with self.connect(write=True) as connection:
             current = connection.execute('SELECT * FROM executions WHERE execution_id=?',(execution_id,)).fetchone()
@@ -275,9 +277,9 @@ class Journal:
             connection.execute("UPDATE executions SET state='ACKNOWLEDGED',ack_source='local_demo' WHERE execution_id=?",(execution_id,))
         return self.status(execution_id)
 
-    def deliver(self, value, expected, actual, wheel, *, _checkpoint=None):
+    def deliver(self, value, expected, actual, wheel, *, _checkpoint=None, _server=False):
         checkpoint = _checkpoint if _checkpoint is not None else lambda stage, info: None
-        packet = parse_delivery(value)
+        packet = parse_delivery(value,source='server_simulated_assignment' if _server else 'local_journal_demo')
         if packet['agent_id'] != self.meta['agent_id'] or packet['project_id'] != self.meta['project_id']:
             raise JournalError('Delivery is outside this journal identity.')
         with self.connect() as connection:
@@ -297,7 +299,7 @@ class Journal:
             prepared['plugin.whl'] = bounded_read(wheel,MAX_WHEEL_BYTES)
             if hashlib.sha256(prepared['plugin.whl']).hexdigest() != packet['manifest']['plugin_package_sha256']:
                 raise JournalError('Package changed during validation.')
-        packet, accepted = self.accept(packet)
+        packet, accepted = self.accept(packet,_server=_server)
         execution_id = packet['execution_id']
         if not accepted:
             return {'newly_accepted':False, **self.reconcile(execution_id)}

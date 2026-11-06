@@ -1,5 +1,9 @@
 # Decisions
 
+## M2B.5 bounded assignment gate
+
+Keep the scheduler as an explicit foreground management command, enabled only with PostgreSQL and LAB_SIMULATOR_DISPATCH=1. Default-deny policy binds one simulated device/agent/approved package version/shared station. Persist assignment before delivery and retain all four leases after local completion; M2B.6 owns evidence ingestion/acknowledgement. A completion digest is not a backend test result. No broker/outbox boundary exists yet; introduce the outbox when one is added. No new dependency or service was installed. See [M2B_5.md](M2B_5.md) and [STATUS.md](STATUS.md).
+
 1. **Django 5.2.18 LTS + Python 3.11.** Official [download/support table](https://www.djangoproject.com/download/) and [5.2 release notes](https://docs.djangoproject.com/en/5.2/releases/5.2/) checked on 2026-11-02. 5.2 supports Python 3.11 and has an LTS support window through April 2028. PyPI confirmed 5.2.18 available; installed version was checked. Latest overall Django would require a newer Python. requirements.lock pins the resolved runtime; source requirements show intentional top-level dependencies.
 2. **Server templates before a SPA.** Ordinary forms and shared authorization querysets are easier to inspect in a two-hour daily learning window. No measured need for an SPA exists.
 3. **Custom user from the first migration.** Keep Django's hashing, sessions and authentication while making account email unique. Bootstrap/invitation normalize emails. Local OS operators must preserve that normalization. Later OIDC can link external identity without replacing project memberships.

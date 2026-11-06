@@ -5,12 +5,17 @@ from lab import api
 from lab import portal_jobs
 from lab import agent_api
 from lab import agent_portal
+from lab import dispatch
 
 urlpatterns = [
     path("api/v1/projects/<uuid:project_id>/agents", agent_api.administrators),
     path("api/v1/projects/<uuid:project_id>/agents/<uuid:agent_id>", agent_api.administrator_detail),
     path("api/v1/agents/<uuid:agent_id>/enroll", agent_api.enrollment),
     path("api/v1/agents/<uuid:agent_id>/heartbeat", agent_api.contact),
+    path("api/v1/agents/<uuid:agent_id>/poll", agent_api.agent_endpoint('Bearer',dispatch.poll)),
+    path("api/v1/agents/<uuid:agent_id>/claim", agent_api.agent_endpoint('Bearer',dispatch.claim)),
+    path("api/v1/agents/<uuid:agent_id>/input", agent_api.agent_endpoint('Bearer',dispatch.input_bytes)),
+    path("api/v1/agents/<uuid:agent_id>/receipt", agent_api.agent_endpoint('Bearer',dispatch.receipt)),
     path("health/", api.health),
     path("ready/", api.ready),
     path("api/v1/catalog", api.catalog),

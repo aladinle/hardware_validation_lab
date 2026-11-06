@@ -1,14 +1,14 @@
 {% extends 'base.html' %}{% block content %}
 <h1>Agent enrollment & contact</h1>
-<div class="notice">M2B.1 records contact with an authenticated agent process only. Device discovery, readiness, assignments and workloads are disabled.</div>
+<div class="notice">Enrollment and contact do not establish hardware readiness. Explicitly configured agents can poll synthetic CAN file assignments. Physical discovery and execution remain disabled.</div>
 {% if notice %}<p role="status">{{ notice }}</p>{% endif %}
 <section class="card card-form"><h2>Enroll a native agent</h2><p>Choose inventory from this project. The download is a single-use enrollment credential valid for 15 minutes. Store it privately on the intended agent host.</p>
 <form method="post">{% csrf_token %}<input type="hidden" name="action" value="create">{{ form.as_p }}<button class="primary">Create identity & download enrollment</button></form></section>
-{% for agent in agents %}<section class="card card-form"><h2>{{ agent.name }}</h2><p>ID: <code>{{ agent.pk }}</code></p>
+{% for agent in agents %}<section class="card card-form"><h2>{{ agent.name }}</h2><p>Agent ID: <code>{{ agent.pk }}</code></p>
 <p>Status: {% if not agent.enabled %}Disabled{% elif agent.enrolled_at %}Enrolled{% else %}Awaiting enrollment{% endif %}</p>
 <p>Last authenticated process contact: {{ agent.last_contact_at|date:'M j, Y H:i:s T'|default:'Never' }}. Historical contact is not a live or readiness guarantee.</p>
 <p>Reported platform: {{ agent.reported_platform|default:'Unknown' }} · Reported version: {{ agent.reported_version|default:'Unknown' }}</p>
-<p>Hardware connected: Unknown / not discovered · Device readiness: Not evaluated · Execution: Disabled</p>
+<p>Hardware connected: Unknown / not discovered · Device readiness: Not evaluated · Physical execution: Disabled</p>
 <form method="post">{% csrf_token %}<input type="hidden" name="agent_id" value="{{ agent.pk }}"><button name="action" value="rotate">Rotate & download agent credential</button><button name="action" value="reenroll">Reissue enrollment</button><button name="action" value="revoke">Revoke credentials</button><button name="action" value="disable">Disable agent</button></form>
 </section>{% empty %}<section class="card card-form"><p>No agents enrolled or pending in this project.</p></section>{% endfor %}
 {% endblock %}

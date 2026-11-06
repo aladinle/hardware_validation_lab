@@ -27,6 +27,8 @@ def invalidate(agent):
     now = timezone.now()
     AgentCredential.objects.filter(agent=agent, revoked_at=None).update(revoked_at=now)
     AgentEnrollment.objects.filter(agent=agent, revoked_at=None, consumed_at=None).update(revoked_at=now)
+    agent.execution_contact_at=None
+    agent.save(update_fields=['execution_contact_at'])
 
 
 def issue_enrollment(agent, issuer):
