@@ -1,6 +1,10 @@
 # Architecture
 
-Scope follows the [unified roadmap](PLAN.md) and [requirements checklist](REQUIREMENTS.md). M2A adds durable queued submission; M2B.1 adds native agent identity and idle contact. M2B.2 adds explicit local synthetic file analysis; no platform workload dispatch or hardware execution exists. Detailed contracts/setup are in [M2A.md](M2A.md).
+## Implemented in M2B.5
+
+Opt-in separate PostgreSQL allocator commits immutable Attempt plus global/agent/device/shared leases before native polling. Native agent downloads scoped bounded inputs and delegates to its durable journal/contained runner. The SQL control receipt records only a completion digest; local reports remain unacknowledged, leases held. Default is disabled; one global worker/assignment per agent. No physical readiness or backend outcome. Earlier milestone sections describe their historical scope. See [M2B_5.md](M2B_5.md) and [STATUS.md](STATUS.md).
+
+Scope follows the [unified roadmap](PLAN.md) and [requirements checklist](REQUIREMENTS.md). M2A adds durable queued submission; M2B.1 adds native agent identity and idle contact. M2B.2 adds explicit local synthetic file analysis; the historical M2B.2 gate had no platform workload dispatch or hardware execution. Detailed contracts/setup are in [M2A.md](M2A.md).
 
 ## Implemented in M2B.4
 

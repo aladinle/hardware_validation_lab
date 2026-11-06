@@ -5,6 +5,8 @@ COPY requirements.lock /app/requirements.lock
 RUN pip install --no-cache-dir -r requirements.lock
 COPY web /app/web
 COPY contracts /app/contracts
+COPY agent /app/agent
+COPY workloads /app/workloads
 RUN useradd --uid 10001 --create-home lab && mkdir -p /app/.local && chown lab:lab /app/.local
 USER lab
 EXPOSE 8765

@@ -24,10 +24,10 @@ def sha(value):
     return value
 
 
-def parse_delivery(value):
+def parse_delivery(value, *, source='local_journal_demo'):
     schema(value, {'source', 'agent_id', 'project_id', 'execution_id', 'job_id', 'device_ids', 'epoch',
                    'deadline', 'manifest', 'parameters', 'inputs', 'limits'})
-    if value['source'] != 'local_journal_demo':
+    if source not in {'local_journal_demo','server_simulated_assignment'} or value['source'] != source:
         raise ContractError('Only explicit local demonstration deliveries are enabled.')
     result = dict(value)
     for key in ('agent_id','project_id','execution_id','job_id'):

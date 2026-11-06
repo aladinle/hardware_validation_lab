@@ -78,3 +78,22 @@ class Transport:
             return result
         except (ValueError, UnicodeError):
             raise AgentError("Backend returned an invalid protocol response.") from None
+
+    def post_bytes(self,path,payload,credential,*,maximum=1024*1024):
+        if not path.startswith('/api/v1/agents/') or not path.endswith('/input') or any(c in path for c in ('?','#','..')):
+            raise AgentError('Unsupported agent input route.')
+        encoded=json.dumps(payload,allow_nan=False,separators=(',',':')).encode()
+        if len(encoded)>MAX_MESSAGE_BYTES or type(maximum) is not int or not 0<=maximum<=1024*1024:
+            raise AgentError('Input request exceeds its bound.')
+        request=Request(self.base_url+path,data=encoded,method='POST',headers={'Content-Type':'application/json','Authorization':'Bearer '+credential})
+        try:
+            with self.opener.open(request,timeout=self.timeout) as response:
+                raw=response.read(maximum+1)
+                if len(raw)>maximum or response.headers.get_content_type()!='application/octet-stream':
+                    raise AgentError('Backend input violates its bounded contract.')
+                return raw
+        except HTTPError as exc:
+            if exc.code in (401,403):raise AgentError('Agent credential or scope was rejected; contact the project administrator.') from None
+            raise AgentError('Backend rejected the scoped input request.') from None
+        except (URLError,OSError,TimeoutError):
+            raise AgentError('Backend input contact failed within its timeout.') from None

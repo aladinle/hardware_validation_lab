@@ -74,6 +74,28 @@ class M2ATests(Fixture, TestCase):
     def queue(self, data=None, key="request-1"):
         return self.post("/api/v1/jobs", data or self.payload, HTTP_IDEMPOTENCY_KEY=key)
 
+    def test_workbench_validates_only_the_submitted_form(self):
+        self.client.force_login(self.admin)
+        url = reverse("workbench", args=[self.project.pk])
+        for action in ("approve", "revoke", "grant", "ungrant", "publish"):
+            with self.subTest(action=action):
+                response = self.client.post(url, {"action": action, "version_id": self.version.pk,
+                    "member_id": self.member.pk, "definition_id": self.definition.pk})
+                self.assertEqual(response.status_code, 200)
+                self.assertFalse(response.context["form"].is_bound)
+                self.assertNotContains(response, "This field is required.")
+        self.assertTrue(TestApproval.objects.filter(version=self.version, revoked_at__isnull=False).exists())
+        self.assertFalse(TestGrant.objects.filter(membership=self.member, version=self.version).exists())
+        self.assertEqual(self.definition.versions.count(), 2)
+        before = TestDefinition.objects.count()
+        for payload, field in (({}, "name"), ({"name": "Draft without header"}, "header_bytes")):
+            with self.subTest(missing_field=field):
+                response = self.client.post(url, {"action": "save", **payload})
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(response.context["form"].is_bound)
+                self.assertEqual(response.context["form"].errors[field], ["This field is required."])
+        self.assertEqual(TestDefinition.objects.count(), before)
+
     def test_real_http_queue_replay_conflict_and_no_execution(self):
         response = self.queue()
         self.assertEqual(response.status_code, 201, response.content)

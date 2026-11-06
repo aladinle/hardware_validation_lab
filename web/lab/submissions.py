@@ -198,7 +198,8 @@ def submit(actor, key, payload):
                     "device_capabilities": device.capabilities, "firmware": None, "hardware_revision": None,
                     "software_commit": request.software_commit, "agent_version": None, "environment": None,
                     "parameters": item.parameters, "inputs": {"expected": expected.sha256, "actual": actual.sha256},
-                    "requester_id": user.pk, "service_principal_id": str(principal.pk) if principal else None}
+                    "requester_id": user.pk, "service_principal_id": str(principal.pk) if principal else None,
+                    "submission_token_id": str(actor.token_id) if actor.token_id else None, "session_epoch": user.session_epoch}
         job = Job.objects.create(batch=batch, version=version, device=device, expected=expected, actual=actual,
                                  parameters=item.parameters, snapshot=snapshot, queue_deadline=timezone.now() + timedelta(seconds=request.queue_seconds))
         Run.objects.create(job=job)

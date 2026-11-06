@@ -12,6 +12,7 @@ SECRET_KEY = os.environ.get("LAB_SECRET_KEY", "")
 if len(SECRET_KEY) < 40:
     raise ImproperlyConfigured("Set LAB_SECRET_KEY to a random secret of at least 40 characters.")
 DEBUG = False
+SIMULATOR_DISPATCH = os.environ.get('LAB_SIMULATOR_DISPATCH') == '1'
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
 INSTALLED_APPS = [
     "django.contrib.auth", "django.contrib.contenttypes", "django.contrib.sessions",

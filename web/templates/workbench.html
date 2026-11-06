@@ -1,6 +1,6 @@
 {% extends 'base.html' %}{% block content %}
 <h1>Test authoring & approval</h1>
-<div class="notice">CAN comparison contract metadata only. Published snapshots are immutable; approval permits queuing, not execution in this milestone.</div>
+<div class="notice">Portal publishing creates immutable metadata-only versions. Approved package-bound versions can be queued for explicitly configured synthetic agents. Physical execution is unavailable.</div>
 {% if notice %}<p role="status">{{ notice }}</p>{% endif %}
 <section class="card card-form"><h2>Save a draft</h2><form method="post">{% csrf_token %}<input type="hidden" name="action" value="save">{{ form.as_p }}<button>Save draft</button></form></section>
 {% for draft in drafts %}

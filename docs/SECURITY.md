@@ -1,5 +1,9 @@
 # Security model and release boundary
 
+## M2B.5 authority boundary
+
+Current requester/membership/grants/approval, original service token, immutable snapshot/input checks and package/device policy are rechecked before allocation and every claim/input/receipt. Agent Bearer authority has no browser/CI fallback; browser CSRF remains enforced. PostgreSQL lock ordering, unique live leases and epoch/claim fencing reject stale requests without releasing ownership. Fixed 90-second expiry quarantines in place; no stopped hardware is inferred. Journals pin authenticated backend origin; server executions reject fake local ACK. Package self-report is not hostile-host attestation. Earlier gate notes are historical. See [M2B_5.md](M2B_5.md) and [STATUS.md](STATUS.md).
+
 M0/M1/M2A/M2B.1 are **local development only**, with no internet release configuration. Settings require LAB_LOCAL_DEV=1, an environment secret and loopback Host values. Native launch binds 127.0.0.1; the optional unverified container binds internally but publishes loopback only. No Windows security settings are changed. M2A API/session/token/artifact details and tested limits are in [M2A.md](M2A.md).
 
 ## Accounts and sessions

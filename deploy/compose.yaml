@@ -20,6 +20,7 @@ services:
       dockerfile: deploy/Dockerfile
     environment:
       LAB_LOCAL_DEV: "1"
+      LAB_SIMULATOR_DISPATCH: ${LAB_SIMULATOR_DISPATCH:-0}
       LAB_SECRET_KEY: ${LAB_SECRET_KEY:?Set LAB_SECRET_KEY}
       LAB_DB: postgres
       PGDATABASE: ${PGDATABASE:?Set PGDATABASE}
@@ -39,6 +40,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  scheduler:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    profiles: [simulator]
+    command: ["python", "web/manage.py", "scheduler", "--confirm-simulated", "--iterations", "1000", "--interval", "1"]
+    environment:
+      LAB_LOCAL_DEV: "1"
+      LAB_SIMULATOR_DISPATCH: "1"
+      LAB_SECRET_KEY: ${LAB_SECRET_KEY:?Set LAB_SECRET_KEY}
+      LAB_DB: postgres
+      PGDATABASE: ${PGDATABASE:?Set PGDATABASE}
+      PGUSER: ${PGUSER:?Set PGUSER}
+      PGPASSWORD: ${PGPASSWORD:?Set PGPASSWORD}
+      PGHOST: postgres
+      PGPORT: "5432"
+    volumes:
+      - lab_local:/app/.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      web:
+        condition: service_healthy
 volumes:
   lab_pgdata:
   lab_local:

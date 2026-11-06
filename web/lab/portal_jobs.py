@@ -63,11 +63,11 @@ def workbench(request, project_id):
     ctx = context(request, project_id, "Test Catalog")
     if ctx["role"] not in {Role.ADMIN, Role.ENGINEER}:
         raise Http404
-    form = DraftForm(request.POST if request.method == "POST" else None)
+    action = request.POST.get("action") if request.method == "POST" else None
+    form = DraftForm(request.POST if action == "save" else None)
     notice = ""
     if request.method == "POST":
         try:
-            action = request.POST.get("action")
             if action == "save" and form.is_valid():
                 definition = edit_draft(Actor(request.user.pk), project_id, {"name": form.cleaned_data["name"], "header_bytes": form.cleaned_data["header_bytes"]}, form.cleaned_data["definition_id"])
                 notice = f"Draft saved: {definition.pk}"

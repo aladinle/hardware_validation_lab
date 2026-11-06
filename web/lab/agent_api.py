@@ -2,7 +2,7 @@
 from functools import wraps
 from django.core.exceptions import RequestDataTooBig, ValidationError
 from django.db import DatabaseError, transaction
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from contracts.v1 import ContractError, exact_keys
 from .api import api_view, body, error
@@ -53,7 +53,7 @@ def agent_endpoint(scheme, function):
             with transaction.atomic():
                 payload = body(request)
                 response = function(agent_id, authorization[len(scheme) + 1:], payload)
-                return JsonResponse(response)
+                return response if isinstance(response,HttpResponse) else JsonResponse(response)
         except Rejected as exc:
             return error(exc.code, exc.message, exc.status)
         except (ContractError, ValidationError, ValueError, TypeError):
