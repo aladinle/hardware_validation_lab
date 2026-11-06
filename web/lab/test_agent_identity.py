@@ -171,8 +171,9 @@ class AgentIdentityTests(TestCase):
         # M2B.5 adds an explicitly disabled-by-default claim route. Heartbeat
         # itself still never assigns work or attests readiness.
         self.assertEqual(self.post(f"/api/v1/agents/{agent.pk}/claim", {}, credential["token"]).status_code,409)
-        for suffix in ("result", "events", "cancel"):
-            self.assertEqual(self.post(f"/api/v1/agents/{agent.pk}/{suffix}", {}, credential["token"]).status_code, 404)
+        for suffix in ("result", "events"):
+            self.assertEqual(self.post(f"/api/v1/agents/{agent.pk}/{suffix}", {}, credential["token"]).status_code, 400)
+        self.assertEqual(self.post(f"/api/v1/agents/{agent.pk}/cancel", {}, credential["token"]).status_code,404)
 
     def test_duplicate_heartbeat_does_not_refresh_contact_and_conflict_is_409(self):
         agent, ticket = self.create()

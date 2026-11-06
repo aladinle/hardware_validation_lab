@@ -1,1 +1,25 @@
-{% extends 'base.html' %}{% block content %}<h1>Queued test request</h1><div class="notice">Awaiting execution support. No attempt, result or hardware reservation exists.</div><section class="card card-form"><p><strong>Status:</strong> {{ job.get_state_display }}</p><p><strong>Test:</strong> {{ job.snapshot.test_name }}</p><p><strong>Device:</strong> {{ job.snapshot.device_name }} · {{ job.snapshot.device_source }} · Offline / readiness unknown</p><p><strong>Reference header bytes:</strong> {{ job.parameters.header_bytes }}</p><p><strong>Queue deadline:</strong> {{ job.queue_deadline|date:'M j, Y H:i T' }}{% if job.queue_deadline < now %} · elapsed{% endif %}</p><p><strong>Outcome:</strong> Not evaluated</p><p><strong>Job ID:</strong> <code>{{ job.pk }}</code></p><p><strong>Run ID:</strong> <code>{{ job.run.pk }}</code></p><p><strong>Batch ID:</strong> <code>{{ job.batch_id }}</code></p><p class="muted">Unknown firmware, software revision and host measurements remain unknown. No dispatch or cancellation engine is enabled in M2A.</p><a href="{% url 'section' project.pk 'runs' %}">Return to requests</a></section>{% endblock %}
+{% extends 'base.html' %}{% block content %}
+<h1>Test request</h1>
+<div class="notice">Synthetic file comparison only. Physical device readiness is unknown. Resource reservations remain held until safe reconciliation.</div>
+<section class="card card-form">
+<p><strong>Status:</strong> {{ job.get_state_display }}</p>
+<p><strong>Test:</strong> {{ job.snapshot.test_name }}</p>
+<p><strong>Device:</strong> {{ job.snapshot.device_name }} · {{ job.snapshot.device_source }} · Offline / readiness unknown</p>
+<p><strong>Reference header bytes:</strong> {{ job.parameters.header_bytes }}</p>
+<p><strong>Queue deadline:</strong> {{ job.queue_deadline|date:'M j, Y H:i T' }}{% if job.queue_deadline < now %} · elapsed{% endif %}</p>
+<p><strong>Outcome:</strong> {% if result %}{{ result.runner.outcome }}{% else %}Not evaluated{% endif %}</p>
+<p><strong>Job ID:</strong> <code>{{ job.pk }}</code></p>
+<p><strong>Run ID:</strong> <code>{{ job.run.pk }}</code></p>
+<p><strong>Batch ID:</strong> <code>{{ job.batch_id }}</code></p>
+{% if result %}
+<h2>Stored execution result</h2>
+<p><strong>Execution ID:</strong> <code>{{ result.execution_id }}</code> · Epoch {{ result.epoch }}</p>
+<p>Evaluation: {{ result.runner.evaluation_status }} · Cleanup: {{ result.runner.cleanup_status }} · Evidence: {{ result.runner.evidence_status }}</p>
+<p>Backend received: {{ result.received_at }} · Local process termination confirmed: {{ result.runner.termination_confirmed|yesno:'Yes,No' }}</p>
+<p>Evidence receipt acknowledged. Reservations remain held; physical readiness has not been evaluated.</p>
+<p><a href="/api/v1/jobs/{{ job.pk }}/result">View versioned execution report (JSON)</a></p>
+<ul>{% for output in result.outputs %}<li><a href="/api/v1/outputs/{{ output.id }}">Download {{ output.name }}</a> · {{ output.size }} bytes · SHA-256 <code>{{ output.sha256 }}</code></li>{% endfor %}</ul>
+{% else %}<p>Backend evidence: pending. Local agent completion alone does not establish an uploaded result.</p>{% endif %}
+<p class="muted">Unknown firmware, software revision and host sensors remain unknown. Cancellation is not enabled in this gate.</p>
+<a href="{% url 'section' project.pk 'runs' %}">Return to requests</a>
+</section>{% endblock %}

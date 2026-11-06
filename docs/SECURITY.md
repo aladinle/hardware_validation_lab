@@ -1,5 +1,9 @@
 # Security model and release boundary
 
+## M2B.6 evidence and read authority
+
+Every upload/result/event binds current agent key, receiver, Attempt/epoch/claim, requester/service scope and resource fence. Fixed names, size/total caps, strict JSON/UTF-8/checksums and immutable SQL rows reject traversal/conflicting overwrite. Outcome commit requires all sealed outputs and validates CAN evidence against accepted raw inputs. Downloads recheck current job/member/grant/service scope, verify bytes and force private attachments; copied URLs grant no authority. An identical finalized replay can recover a lost ACK after deadline without any new mutation/release; unfinished expired work remains blocked. ACK is neither physical readiness nor lease release. No user live credentials or quarantine are reset. See [M2B_6.md](M2B_6.md) and [STATUS.md](STATUS.md).
+
 ## M2B.5 authority boundary
 
 Current requester/membership/grants/approval, original service token, immutable snapshot/input checks and package/device policy are rechecked before allocation and every claim/input/receipt. Agent Bearer authority has no browser/CI fallback; browser CSRF remains enforced. PostgreSQL lock ordering, unique live leases and epoch/claim fencing reject stale requests without releasing ownership. Fixed 90-second expiry quarantines in place; no stopped hardware is inferred. Journals pin authenticated backend origin; server executions reject fake local ACK. Package self-report is not hostile-host attestation. Earlier gate notes are historical. See [M2B_5.md](M2B_5.md) and [STATUS.md](STATUS.md).
